@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/digital-treasury-design-system-47cac8ed-66ed-4021-912d-50641f4515be/colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--ink-9);font-family:var(--font-sans)}
+  ::selection{background:var(--aqua);color:#0A0A0A}
+  @keyframes vg-spin{to{transform:rotate(360deg)}}
+  @keyframes vg-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+  @keyframes vg-bar{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+  .vg-scroll::-webkit-scrollbar{width:10px;height:10px}
+  .vg-scroll::-webkit-scrollbar-thumb{background:var(--ink-6);border-radius:999px;border:3px solid var(--ink-9)}
+  [data-lucide]{width:1em;height:1em;stroke-width:1.9}
+  .vg-row-hover:hover{background:var(--ink-9)!important}
+  .vg-card-hover{transition:border-color .2s var(--ease-out),transform .2s var(--ease-out),box-shadow .2s var(--ease-out)}
+  .vg-card-hover:hover{border-color:var(--ink-3)!important;transform:translateY(-2px);box-shadow:var(--shadow-2)}
+  .vg-btn{transition:background .15s var(--ease-out),transform .1s var(--ease-out),border-color .15s var(--ease-out)}
+  .vg-btn:active{transform:scale(.97)}
+  .vg-link:hover{color:var(--ink-1)!important;text-decoration:underline;text-underline-offset:3px}
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;background:var(--ink-9)">
+
+  <sc-if value="{{ showRail }}" hint-placeholder-val="{{ true }}">
+  <aside style="width:236px;flex:none;background:var(--ink-10);border-right:1px solid var(--ink-7);display:flex;flex-direction:column;position:sticky;top:0;height:100vh">
+    <div style="padding:22px 22px 18px;display:flex;align-items:center;gap:11px">
+      <svg viewBox="0 0 107.72 53.86" style="width:26px;height:auto" xmlns="http://www.w3.org/2000/svg"><path d="m0,0h26.93C41.79,0,53.86,12.07,53.86,26.93h0c0,14.86-12.07,26.93-26.93,26.93H0V0H0Z" fill="#0A0A0A"/><rect x="53.86" width="53.86" height="19.84" fill="#0A0A0A"/></svg>
+      <span style="font-size:19px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1)">Vigil</span>
+    </div>
+
+    <nav style="padding:8px 12px;display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ navItems }}" as="n" hint-placeholder-count="3">
+        <button class="vg-btn" onClick="{{ n.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:{{ n.weight }};padding:9px 12px;border-radius:9px;background:{{ n.bg }};color:{{ n.color }}">
+          <i data-lucide="{{ n.icon }}" style="font-size:18px"></i>
+          <span style="flex:1">{{ n.label }}</span>
+          <sc-if value="{{ n.badge }}" hint-placeholder-val="">
+            <span style="min-width:20px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:var(--status-danger);color:#fff;font-size:11px;font-weight:700">{{ n.badge }}</span>
+          </sc-if>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="margin-top:auto;padding:14px 12px;border-top:1px solid var(--ink-7)">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px">
+        <div style="width:30px;height:30px;border-radius:999px;background:var(--ink-1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600">SK</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:var(--ink-1);line-height:1.2">Sara Keating</div>
+          <div style="font-size:11px;color:var(--ink-5)">@digitaltreasury.com.au</div>
+        </div>
+        <i data-lucide="log-out" style="font-size:16px;color:var(--ink-5);cursor:pointer"></i>
+      </div>
+    </div>
+  </aside>
+  </sc-if>
+
+  <main class="vg-scroll" style="flex:1;min-width:0;max-height:100vh;overflow-y:auto">
+
+    <!-- ============ LOGIN ============ -->
+    <sc-if value="{{ r_login }}" hint-placeholder-val="">
+      <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink-0);padding:24px">
+        <div style="width:100%;max-width:380px;text-align:center;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:center;gap:13px;margin-bottom:30px">
+            <svg viewBox="0 0 107.72 53.86" style="width:34px;height:auto"><path d="m0,0h26.93C41.79,0,53.86,12.07,53.86,26.93h0c0,14.86-12.07,26.93-26.93,26.93H0V0H0Z" fill="#fff"/><rect x="53.86" width="53.86" height="19.84" fill="#fff"/></svg>
+            <span style="font-size:30px;font-weight:700;letter-spacing:-.02em">Vigil</span>
+          </div>
+          <h1 style="font-size:26px;font-weight:700;letter-spacing:-.02em;margin:0 0 8px;color:#fff;line-height:1.2">Find breakage before<br>the client does.</h1>
+          <p style="font-size:14px;color:#8A8A8A;margin:0 0 32px;line-height:1.5">Visual &amp; code regression testing for the<br>Digital Treasury fleet.</p>
+          <button class="vg-btn" onClick="{{ onLogin }}" style="width:100%;height:48px;border-radius:11px;border:none;background:#fff;color:#0A0A0A;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.4 14.97.4 12 .4A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 6.93 9.14 4.75 12 4.75z"/></svg>
+            Continue with Google
+          </button>
+          <p style="font-size:12px;color:#6B6B6B;margin:18px 0 0;line-height:1.5">Access is restricted to the<br><span style="color:#CFCFCF">digitaltreasury.com.au</span> workspace.</p>
+          <div style="margin-top:18px;display:flex;align-items:center;gap:9px;justify-content:center;padding:11px 14px;border:1px solid rgba(192,50,43,.4);background:rgba(192,50,43,.12);border-radius:10px">
+            <i data-lucide="shield-alert" style="font-size:16px;color:#E58781"></i>
+            <span style="font-size:12.5px;color:#E58781;text-align:left">That account isn't on the digitaltreasury.com.au workspace.</span>
+          </div>
+          <p style="font-size:11px;color:#4A4A4A;margin:10px 0 0">↑ access-denied state shown for the mockup</p>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ DASHBOARD ============ -->
+    <sc-if value="{{ r_dashboard }}" hint-placeholder-val="">
+      <div style="padding:34px 40px 60px;max-width:1180px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:26px">
+          <div>
+            <div class="dt-eyebrow" style="margin-bottom:8px">Fleet overview</div>
+            <h1 style="font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0">Good morning, Sara.</h1>
+            <p style="margin:6px 0 0;font-size:14px;color:var(--ink-4)">Monday 30 June · 4 pages need your eyes this morning.</p>
+          </div>
+          <button class="vg-btn" onClick="{{ onAddClient }}" style="display:flex;align-items:center;gap:8px;height:42px;padding:0 18px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer">
+            <i data-lucide="plus" style="font-size:17px"></i> Add client
+          </button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px">
+          <sc-for list="{{ statCards }}" as="s" hint-placeholder-count="4">
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:8px;color:var(--ink-4);font-size:12.5px;font-weight:500;margin-bottom:12px">
+                <i data-lucide="{{ s.icon }}" style="font-size:15px;color:{{ s.accent }}"></i> {{ s.label }}
+              </div>
+              <div style="font-size:34px;font-weight:700;letter-spacing:-.02em;color:{{ s.valueColor }};line-height:1">{{ s.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h2 style="font-size:16px;font-weight:600;color:var(--ink-1);margin:0">Clients</h2>
+            <span style="font-size:13px;color:var(--ink-5)">sorted by — needs attention first</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;height:36px;padding:0 12px;border:1px solid var(--ink-7);border-radius:9px;background:var(--ink-10);width:240px">
+            <i data-lucide="search" style="font-size:15px;color:var(--ink-5)"></i>
+            <span style="font-size:13px;color:var(--ink-5)">Search clients…</span>
+          </div>
+        </div>
+
+        <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:2.4fr 1.5fr 1.3fr 1fr auto;gap:16px;padding:11px 22px;border-bottom:1px solid var(--ink-7);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-5)">
+            <span>Client</span><span>Last run</span><span>Status</span><span>Next run</span><span></span>
+          </div>
+          <sc-for list="{{ clients }}" as="c" hint-placeholder-count="6">
+            <div class="vg-row-hover" onClick="{{ c.onOpen }}" style="display:grid;grid-template-columns:2.4fr 1.5fr 1.3fr 1fr auto;gap:16px;align-items:center;padding:15px 22px;border-bottom:1px solid var(--ink-8);cursor:pointer;transition:background .12s">
+              <div style="display:flex;align-items:center;gap:13px;min-width:0">
+                <div style="width:38px;height:38px;flex:none;border-radius:10px;background:var(--ink-1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600">{{ c.initials }}</div>
+                <div style="min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:14.5px;font-weight:600;color:var(--ink-1);white-space:nowrap">{{ c.name }}</span>
+                    <sc-if value="{{ c.checkpoint }}" hint-placeholder-val="">
+                      <span style="display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--ink-3);background:var(--ink-8);border:1px solid var(--ink-7);padding:1px 7px;border-radius:999px"><i data-lucide="flag" style="font-size:11px"></i>checkpoint</span>
+                    </sc-if>
+                  </div>
+                  <div style="font-size:12.5px;color:var(--ink-5)">{{ c.url }} · {{ c.pages }} pages</div>
+                </div>
+              </div>
+              <div style="font-size:13px;color:var(--ink-3);min-width:0">
+                <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.lastRun }}</div>
+                <div style="font-size:12px;color:var(--ink-5)">{{ c.lastRunAt }}</div>
+              </div>
+              <div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:4px 11px 4px 9px;border-radius:999px;font-size:12.5px;font-weight:600;background:{{ c.statusBg }};color:{{ c.statusColor }}">
+                  <sc-if value="{{ c.running }}" hint-placeholder-val=""><span style="width:8px;height:8px;border-radius:999px;background:{{ c.statusColor }};animation:vg-pulse 1s var(--ease-in-out) infinite"></span></sc-if>
+                  <sc-if value="{{ c.notRunning }}" hint-placeholder-val="{{ true }}"><span style="width:8px;height:8px;border-radius:999px;background:{{ c.statusColor }}"></span></sc-if>
+                  {{ c.statusLabel }}
+                </span>
+              </div>
+              <div style="font-size:13px;color:var(--ink-4)">{{ c.next }}</div>
+              <button class="vg-btn" onClick="{{ c.onRun }}" style="display:flex;align-items:center;gap:6px;height:34px;padding:0 13px;border-radius:8px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">
+                <i data-lucide="play" style="font-size:14px"></i> Run now
+              </button>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ CLIENT DETAIL ============ -->
+    <sc-if value="{{ r_client }}" hint-placeholder-val="">
+      <div style="padding:24px 40px 60px;max-width:1180px">
+        <button class="vg-btn vg-link" onClick="{{ navItems.0.onClick }}" style="display:inline-flex;align-items:center;gap:6px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-4);padding:0;margin-bottom:18px">
+          <i data-lucide="chevron-left" style="font-size:15px"></i> Dashboard
+        </button>
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px">
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:54px;height:54px;border-radius:13px;background:var(--ink-1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:600">{{ client.initials }}</div>
+            <div>
+              <h1 style="font-size:26px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0">{{ client.name }}</h1>
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+                <a href="#" class="vg-link" style="font-size:13.5px;color:var(--ink-4);text-decoration:none">{{ client.url }} <i data-lucide="external-link" style="font-size:12px"></i></a>
+                <span style="color:var(--ink-6)">·</span>
+                <span style="font-size:13.5px;color:var(--ink-4)">{{ client.pages }} valuable pages</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <button class="vg-btn" onClick="{{ onToggleCp }}" style="display:flex;align-items:center;gap:7px;height:40px;padding:0 15px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">
+              <i data-lucide="flag" style="font-size:16px"></i>{{ cpBtnLabel }}
+            </button>
+            <button class="vg-btn" onClick="{{ onClientRunNow }}" style="display:flex;align-items:center;gap:7px;height:40px;padding:0 17px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">
+              <i data-lucide="play" style="font-size:16px"></i> Run now
+            </button>
+          </div>
+        </div>
+
+        <sc-if value="{{ clientCpOn }}" hint-placeholder-val="">
+          <div style="display:flex;align-items:center;gap:12px;margin-top:18px;padding:13px 18px;border-radius:11px;background:rgba(180,122,18,.10);border:1px solid rgba(180,122,18,.30)">
+            <i data-lucide="flag" style="font-size:18px;color:#B47A12"></i>
+            <div style="flex:1">
+              <span style="font-size:13.5px;font-weight:600;color:#7A5208">Maintenance checkpoint active</span>
+              <span style="font-size:13px;color:#8A6614"> — started 9:14am. Captures will compare against this "before" snapshot.</span>
+            </div>
+            <button class="vg-btn" onClick="{{ onToggleCp }}" style="height:32px;padding:0 12px;border-radius:8px;border:1px solid rgba(180,122,18,.4);background:transparent;color:#7A5208;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer">End checkpoint</button>
+          </div>
+        </sc-if>
+
+        <!-- tabs -->
+        <div style="display:flex;gap:4px;margin:24px 0 0;border-bottom:1px solid var(--ink-7)">
+          <sc-for list="{{ clientTabs }}" as="t" hint-placeholder-count="4">
+            <button class="vg-btn" onClick="{{ t.onClick }}" style="border:none;background:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:{{ t.weight }};color:{{ t.color }};padding:10px 14px;border-bottom:2px solid {{ t.border }};margin-bottom:-1px">{{ t.label }}</button>
+          </sc-for>
+        </div>
+
+        <!-- PAGES TAB -->
+        <sc-if value="{{ tab_pages }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin:22px 0 12px">
+            <span style="font-size:13px;color:var(--ink-5)">{{ client.pages }} pages captured each run</span>
+            <div style="display:flex;gap:9px">
+              <button class="vg-btn" onClick="{{ onOpenCsv }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:9px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer"><i data-lucide="upload" style="font-size:15px"></i> Import CSV</button>
+              <button class="vg-btn" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 14px;border-radius:9px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer"><i data-lucide="plus" style="font-size:15px"></i> Add page</button>
+            </div>
+          </div>
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:64px 2.2fr 1.3fr 1.4fr auto;gap:16px;padding:11px 22px;border-bottom:1px solid var(--ink-7);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-5)">
+              <span>Baseline</span><span>Page</span><span>Viewports</span><span>Last result</span><span></span>
+            </div>
+            <sc-for list="{{ pages }}" as="p" hint-placeholder-count="6">
+              <div class="vg-row-hover" onClick="{{ p.onOpen }}" style="display:grid;grid-template-columns:64px 2.2fr 1.3fr 1.4fr auto;gap:16px;align-items:center;padding:13px 22px;border-bottom:1px solid var(--ink-8);cursor:pointer;transition:background .12s">
+                <div style="width:48px;height:34px;border-radius:6px;background:var(--ink-8);border:1px solid var(--ink-7);background-image:repeating-linear-gradient(45deg,var(--ink-8),var(--ink-8) 5px,var(--ink-9) 5px,var(--ink-9) 10px)"></div>
+                <div>
+                  <div style="font-size:14px;font-weight:600;color:var(--ink-1)">{{ p.label }}</div>
+                  <div style="font-size:12.5px;color:var(--ink-5)">{{ p.url }}</div>
+                </div>
+                <div style="font-size:12.5px;color:var(--ink-4)">{{ p.vpStr }}</div>
+                <div style="display:flex;align-items:center;gap:9px">
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:999px;font-size:12px;font-weight:600;background:{{ p.statusBg }};color:{{ p.statusColor }}"><span style="width:7px;height:7px;border-radius:999px;background:{{ p.statusColor }}"></span>{{ p.statusLabel }}</span>
+                  <span style="font-size:13px;font-weight:700;color:{{ p.diffColor }}">{{ p.diff }}</span>
+                </div>
+                <i data-lucide="chevron-right" style="font-size:17px;color:var(--ink-5)"></i>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- RUNS TAB -->
+        <sc-if value="{{ tab_runs }}" hint-placeholder-val="">
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;overflow:hidden;margin-top:22px">
+            <div style="display:grid;grid-template-columns:1.4fr 1.4fr 1.6fr auto;gap:16px;padding:11px 22px;border-bottom:1px solid var(--ink-7);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-5)">
+              <span>When</span><span>Trigger</span><span>Result</span><span></span>
+            </div>
+            <sc-for list="{{ clientRuns }}" as="r" hint-placeholder-count="4">
+              <div class="vg-row-hover" onClick="{{ r.onOpen }}" style="display:grid;grid-template-columns:1.4fr 1.4fr 1.6fr auto;gap:16px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--ink-8);cursor:pointer;transition:background .12s">
+                <span style="font-size:13.5px;font-weight:600;color:var(--ink-1)">{{ r.when }}</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-4)"><i data-lucide="{{ r.icon }}" style="font-size:14px"></i>{{ r.trigger }}</span>
+                <span style="display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-3)"><span style="width:7px;height:7px;border-radius:999px;background:{{ r.statusColor }}"></span>{{ r.result }}</span>
+                <span class="vg-link" style="font-size:13px;font-weight:600;color:var(--ink-4)">View report →</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <!-- SCHEDULE TAB -->
+        <sc-if value="{{ tab_schedule }}" hint-placeholder-val="">
+          <div style="max-width:560px;margin-top:22px;background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:26px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:18px;border-bottom:1px solid var(--ink-8)">
+              <div><div style="font-size:15px;font-weight:600;color:var(--ink-1)">Scheduled runs</div><div style="font-size:13px;color:var(--ink-5);margin-top:2px">Capture automatically on a cadence.</div></div>
+              <div style="width:44px;height:26px;border-radius:999px;background:var(--ink-1);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:999px;background:#fff"></div></div>
+            </div>
+            <div style="padding-top:20px;display:flex;flex-direction:column;gap:18px">
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:8px">FREQUENCY</div>
+                <div style="display:flex;gap:8px">
+                  <span style="padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;background:var(--ink-10);border:1px solid var(--ink-7);color:var(--ink-4)">Daily</span>
+                  <span style="padding:8px 14px;border-radius:9px;font-size:13px;font-weight:600;background:var(--ink-1);color:#fff">Weekly</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:8px">DAY</div>
+                <div style="display:flex;gap:6px">
+                  <span style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:600;background:var(--ink-1);color:#fff">Mon</span>
+                  <span style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:500;background:var(--ink-10);border:1px solid var(--ink-7);color:var(--ink-4)">Tue</span>
+                  <span style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:500;background:var(--ink-10);border:1px solid var(--ink-7);color:var(--ink-4)">Wed</span>
+                  <span style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:500;background:var(--ink-10);border:1px solid var(--ink-7);color:var(--ink-4)">Thu</span>
+                  <span style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:9px;font-size:13px;font-weight:500;background:var(--ink-10);border:1px solid var(--ink-7);color:var(--ink-4)">Fri</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:24px">
+                <div><div style="font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:8px">TIME</div><div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--ink-7);border-radius:10px;font-size:14px;font-weight:600;color:var(--ink-1)"><i data-lucide="clock" style="font-size:15px;color:var(--ink-5)"></i> 06:00</div></div>
+                <div><div style="font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:8px">TIMEZONE</div><div style="height:40px;display:flex;align-items:center;padding:0 14px;background:var(--ink-9);border-radius:10px;font-size:14px;color:var(--ink-4)">Australia/Melbourne</div></div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding:13px 16px;background:var(--ink-9);border-radius:10px">
+                <i data-lucide="calendar-check" style="font-size:16px;color:var(--ink-4)"></i>
+                <span style="font-size:13px;color:var(--ink-3)">Next run — <strong style="color:var(--ink-1)">Monday 7 July, 06:00 AEST</strong></span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- CLIENT SETTINGS TAB -->
+        <sc-if value="{{ tab_settings }}" hint-placeholder-val="">
+          <div style="max-width:560px;margin-top:22px;display:flex;flex-direction:column;gap:14px">
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+              <div style="font-size:14px;font-weight:600;color:var(--ink-1)">Diff threshold override</div>
+              <div style="font-size:13px;color:var(--ink-5);margin:2px 0 14px">Changes above this percentage are flagged for review. Global default is 1.0%.</div>
+              <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--ink-7);border-radius:10px;font-size:14px;font-weight:600;color:var(--ink-1)">0.8 <span style="color:var(--ink-5);font-weight:400">%</span></div>
+            </div>
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+              <div style="font-size:14px;font-weight:600;color:var(--ink-1)">Notify list</div>
+              <div style="font-size:13px;color:var(--ink-5);margin:2px 0 14px">Who gets emailed when a run finds changes.</div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <span style="display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 6px 0 12px;border-radius:999px;background:var(--ink-8);font-size:13px;color:var(--ink-2)">sara@digitaltreasury.com.au <i data-lucide="x" style="font-size:14px;color:var(--ink-5);cursor:pointer"></i></span>
+                <span style="display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 6px 0 12px;border-radius:999px;background:var(--ink-8);font-size:13px;color:var(--ink-2)">tom@digitaltreasury.com.au <i data-lucide="x" style="font-size:14px;color:var(--ink-5);cursor:pointer"></i></span>
+                <span style="display:inline-flex;align-items:center;height:32px;padding:0 12px;border-radius:999px;border:1px dashed var(--ink-6);font-size:13px;color:var(--ink-5);cursor:pointer">+ Add email</span>
+              </div>
+            </div>
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px;display:flex;align-items:center;justify-content:space-between">
+              <div><div style="font-size:14px;font-weight:600;color:var(--ink-1)">Lighthouse on every run</div><div style="font-size:13px;color:var(--ink-5);margin-top:2px">Capture Performance / A11y / Best practices / SEO.</div></div>
+              <div style="width:44px;height:26px;border-radius:999px;background:var(--ink-1);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:999px;background:#fff"></div></div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ PAGE DETAIL ============ -->
+    <sc-if value="{{ r_page }}" hint-placeholder-val="">
+      <div style="padding:24px 40px 60px;max-width:1040px">
+        <button class="vg-btn vg-link" onClick="{{ onClientRunNow }}" style="display:inline-flex;align-items:center;gap:6px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-4);padding:0;margin-bottom:16px">
+          <i data-lucide="chevron-left" style="font-size:15px"></i> {{ client.name }}
+        </button>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:24px">
+          <div>
+            <h1 style="font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0">Homepage</h1>
+            <div style="font-size:13.5px;color:var(--ink-4);margin-top:3px">{{ client.url }}/ · Desktop &amp; Mobile</div>
+          </div>
+          <button class="vg-btn" style="display:flex;align-items:center;gap:7px;height:40px;padding:0 15px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer"><i data-lucide="refresh-cw" style="font-size:15px"></i> Re-capture &amp; set baseline</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start">
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:16px">
+              <i data-lucide="bookmark-check" style="font-size:17px;color:#1A8F5F"></i>
+              <span style="font-size:15px;font-weight:600;color:var(--ink-1)">Current baseline</span>
+              <span style="font-size:12.5px;color:var(--ink-5);margin-left:auto">Approved 12 Jun · by Sara</span>
+            </div>
+            <div style="display:flex;gap:16px">
+              <div style="flex:1"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--ink-5);margin-bottom:7px">DESKTOP · 1440×full</div><div style="aspect-ratio:16/11;border-radius:8px;background:var(--ink-9);border:1px solid var(--ink-7);background-image:repeating-linear-gradient(45deg,var(--ink-8),var(--ink-8) 7px,var(--ink-9) 7px,var(--ink-9) 14px)"></div></div>
+              <div style="width:96px"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--ink-5);margin-bottom:7px">MOBILE</div><div style="aspect-ratio:9/16;border-radius:8px;background:var(--ink-9);border:1px solid var(--ink-7);background-image:repeating-linear-gradient(45deg,var(--ink-8),var(--ink-8) 7px,var(--ink-9) 7px,var(--ink-9) 14px)"></div></div>
+            </div>
+          </div>
+
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:20px">
+            <div style="font-size:13px;font-weight:600;color:var(--ink-1);margin-bottom:13px">Capture history</div>
+            <div style="display:flex;flex-direction:column;gap:0">
+              <div style="display:flex;gap:11px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:9px;height:9px;border-radius:999px;background:#B47A12"></span><span style="width:1px;flex:1;background:var(--ink-7)"></span></div><div style="padding-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--ink-1)">Today 9:21am · <span style="color:#B47A12">4.1%</span></div><div style="font-size:12px;color:var(--ink-5)">Maintenance run · awaiting review</div></div></div>
+              <div style="display:flex;gap:11px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:9px;height:9px;border-radius:999px;background:#1A8F5F"></span><span style="width:1px;flex:1;background:var(--ink-7)"></span></div><div style="padding-bottom:16px"><div style="font-size:13px;font-weight:600;color:var(--ink-1)">Mon 06:00 · <span style="color:var(--ink-4)">0.0%</span></div><div style="font-size:12px;color:var(--ink-5)">Scheduled · passed</div></div></div>
+              <div style="display:flex;gap:11px"><div style="display:flex;flex-direction:column;align-items:center"><span style="width:9px;height:9px;border-radius:999px;background:var(--ink-1)"></span></div><div><div style="font-size:13px;font-weight:600;color:var(--ink-1)">12 Jun 2:15pm · baseline set</div><div style="font-size:12px;color:var(--ink-5)">First approved capture</div></div></div>
+            </div>
+          </div>
+
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:15px;font-weight:600;color:var(--ink-1)">Ignore masks</span><span style="font-size:12.5px;color:var(--ink-5);cursor:pointer" class="vg-link">+ Add selector</span></div>
+            <div style="font-size:13px;color:var(--ink-5);margin-bottom:14px">Regions excluded from the visual diff — for content that legitimately changes.</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--ink-9);border-radius:9px"><i data-lucide="eye-off" style="font-size:15px;color:var(--ink-5)"></i><code style="font-family:var(--font-mono);font-size:12.5px;color:var(--ink-2);flex:1">.testimonials-carousel</code><i data-lucide="trash-2" style="font-size:14px;color:var(--ink-5);cursor:pointer"></i></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--ink-9);border-radius:9px"><i data-lucide="eye-off" style="font-size:15px;color:var(--ink-5)"></i><code style="font-family:var(--font-mono);font-size:12.5px;color:var(--ink-2);flex:1">#latest-blog-feed</code><i data-lucide="trash-2" style="font-size:14px;color:var(--ink-5);cursor:pointer"></i></div>
+            </div>
+          </div>
+
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:20px">
+            <div style="font-size:13px;font-weight:600;color:var(--ink-1);margin-bottom:6px">Wait before capture</div>
+            <div style="font-size:12.5px;color:var(--ink-5);margin-bottom:12px">Optionally wait for a selector before screenshotting.</div>
+            <div style="display:flex;align-items:center;gap:9px;height:38px;padding:0 12px;border:1px solid var(--ink-7);border-radius:9px"><i data-lucide="hourglass" style="font-size:14px;color:var(--ink-5)"></i><code style="font-family:var(--font-mono);font-size:12.5px;color:var(--ink-2)">.hero-loaded</code></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ RUN REPORT ============ -->
+    <sc-if value="{{ r_run }}" hint-placeholder-val="">
+      <div style="padding:24px 40px 60px;max-width:1180px">
+        <button class="vg-btn vg-link" onClick="{{ navItems.0.onClick }}" style="display:inline-flex;align-items:center;gap:6px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-4);padding:0;margin-bottom:16px">
+          <i data-lucide="chevron-left" style="font-size:15px"></i> Dashboard
+        </button>
+
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:18px">
+          <div>
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+              <h1 style="font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0">{{ client.name }} — run report</h1>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink-3);background:var(--ink-8);border:1px solid var(--ink-7);padding:3px 10px;border-radius:999px;white-space:nowrap"><i data-lucide="wrench" style="font-size:13px"></i> Maintenance run</span>
+            </div>
+            <div style="font-size:13.5px;color:var(--ink-4)">Today · 9:21am AEST · compared against checkpoint started <strong style="color:var(--ink-2)">9:14am</strong> and last approved baseline.</div>
+          </div>
+          <button class="vg-btn vg-link" onClick="{{ onPreviewEmail }}" style="display:flex;align-items:center;gap:7px;height:36px;padding:0 13px;border-radius:9px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-3);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer"><i data-lucide="mail" style="font-size:15px"></i> Preview email</button>
+        </div>
+
+        <!-- tally -->
+        <div style="display:flex;gap:10px;margin-bottom:8px">
+          <div style="display:flex;align-items:center;gap:9px;padding:11px 16px;background:var(--ink-10);border:1px solid var(--ink-7);border-radius:11px"><span style="width:9px;height:9px;border-radius:999px;background:#1A8F5F"></span><span style="font-size:14px;font-weight:600;color:var(--ink-1)">9 passed</span></div>
+          <div style="display:flex;align-items:center;gap:9px;padding:11px 16px;background:rgba(180,122,18,.08);border:1px solid rgba(180,122,18,.25);border-radius:11px"><span style="width:9px;height:9px;border-radius:999px;background:#B47A12"></span><span style="font-size:14px;font-weight:600;color:#7A5208">2 changes</span></div>
+          <div style="display:flex;align-items:center;gap:9px;padding:11px 16px;background:rgba(192,50,43,.07);border:1px solid rgba(192,50,43,.22);border-radius:11px"><i data-lucide="unplug" style="font-size:15px;color:#C0322B"></i><span style="font-size:14px;font-weight:600;color:#992822">1 capture failed</span></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-5)"><i data-lucide="keyboard" style="font-size:15px"></i> Press <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--ink-8);border:1px solid var(--ink-6);border-radius:4px;padding:1px 6px">J</kbd> / <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--ink-8);border:1px solid var(--ink-6);border-radius:4px;padding:1px 6px">K</kbd> to move between pages</div>
+        </div>
+
+        <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;overflow:hidden;margin-top:14px">
+          <div style="display:grid;grid-template-columns:1.7fr 168px 1.5fr 1.2fr 1fr auto;gap:14px;padding:11px 22px;border-bottom:1px solid var(--ink-7);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-5)">
+            <span>Page</span><span>Before / After / Diff</span><span>Comparison</span><span>Status</span><span>Lighthouse</span><span></span>
+          </div>
+          <sc-for list="{{ runRows }}" as="r" hint-placeholder-count="6">
+            <div class="vg-row-hover" onClick="{{ r.onOpen }}" style="display:grid;grid-template-columns:1.7fr 168px 1.5fr 1.2fr 1fr auto;gap:14px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--ink-8);cursor:pointer;transition:background .12s">
+              <div><div style="font-size:14px;font-weight:600;color:var(--ink-1)">{{ r.label }}</div><div style="font-size:12px;color:var(--ink-5)">{{ r.vp }}</div></div>
+              <div style="display:flex;gap:4px">
+                <div style="width:48px;height:32px;border-radius:5px;background:var(--ink-9);border:1px solid var(--ink-7);background-image:repeating-linear-gradient(45deg,var(--ink-8),var(--ink-8) 5px,var(--ink-9) 5px,var(--ink-9) 10px)"></div>
+                <div style="width:48px;height:32px;border-radius:5px;background:var(--ink-9);border:1px solid var(--ink-7);background-image:repeating-linear-gradient(45deg,var(--ink-8),var(--ink-8) 5px,var(--ink-9) 5px,var(--ink-9) 10px)"></div>
+                <sc-if value="{{ r.notError }}" hint-placeholder-val="{{ true }}"><div style="width:48px;height:32px;border-radius:5px;background:var(--ink-9);border:1px solid var(--ink-7);position:relative;overflow:hidden"><div style="position:absolute;top:6px;left:8px;width:16px;height:7px;background:#FF1F8E;border-radius:2px;opacity:.85"></div><div style="position:absolute;bottom:7px;right:6px;width:11px;height:11px;background:#FF1F8E;border-radius:2px;opacity:.85"></div></div></sc-if>
+                <sc-if value="{{ r.isError }}" hint-placeholder-val=""><div style="width:48px;height:32px;border-radius:5px;background:rgba(192,50,43,.06);border:1px solid rgba(192,50,43,.25);display:flex;align-items:center;justify-content:center"><i data-lucide="unplug" style="font-size:14px;color:#C0322B"></i></div></sc-if>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px;font-size:12.5px">
+                <span style="color:var(--ink-4)">vs start <strong style="color:{{ r.vsStartColor }};font-weight:700">{{ r.vsStart }}</strong></span>
+                <span style="color:var(--ink-4)">vs baseline <strong style="color:{{ r.vsBaselineColor }};font-weight:700">{{ r.vsBaseline }}</strong></span>
+              </div>
+              <div><span style="display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;border-radius:999px;font-size:12px;font-weight:600;background:{{ r.statusBg }};color:{{ r.statusColor }}"><span style="width:7px;height:7px;border-radius:999px;background:{{ r.statusColor }}"></span>{{ r.statusLabel }}</span></div>
+              <div style="font-size:12.5px;font-weight:600;color:{{ r.lhColor }}">{{ r.lh }}</div>
+              <sc-if value="{{ r.notError }}" hint-placeholder-val="{{ true }}"><span class="vg-link" style="font-size:13px;font-weight:600;color:var(--ink-4)">Review →</span></sc-if>
+              <sc-if value="{{ r.isError }}" hint-placeholder-val=""><span class="vg-link" style="font-size:13px;font-weight:600;color:#C0322B">Re-run →</span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ DIFF REVIEW (HERO) ============ -->
+    <sc-if value="{{ r_diff }}" hint-placeholder-val="">
+      <div style="display:flex;flex-direction:column;min-height:100vh">
+        <!-- context bar -->
+        <div style="position:sticky;top:0;z-index:5;background:rgba(255,255,255,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--ink-7);padding:13px 28px;display:flex;align-items:center;gap:16px">
+          <button class="vg-btn" onClick="{{ onBackToRun }}" style="display:flex;align-items:center;gap:6px;border:1px solid var(--ink-7);background:var(--ink-10);cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-3);padding:7px 12px;border-radius:9px"><i data-lucide="arrow-left" style="font-size:15px"></i> Run report</button>
+          <div style="display:flex;align-items:baseline;gap:9px">
+            <span style="font-size:15px;font-weight:700;color:var(--ink-1)">{{ client.name }}</span>
+            <span style="color:var(--ink-6)">/</span>
+            <span style="font-size:15px;font-weight:600;color:var(--ink-2)">Homepage</span>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-4);background:var(--ink-9);padding:4px 10px;border-radius:7px"><i data-lucide="monitor" style="font-size:13px"></i> Desktop</span>
+          <span style="font-size:12.5px;color:var(--ink-5)">{{ client.url }}/ · Today 9:21am</span>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:7px;font-size:12px;color:var(--ink-5)">
+            <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--ink-8);border:1px solid var(--ink-6);border-radius:4px;padding:1px 6px">A</kbd> accept
+            <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--ink-8);border:1px solid var(--ink-6);border-radius:4px;padding:1px 6px">K</kbd> keep
+            <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--ink-8);border:1px solid var(--ink-6);border-radius:4px;padding:1px 6px">J</kbd> next
+          </div>
+        </div>
+
+        <!-- comparison switcher -->
+        <div style="padding:18px 28px 0;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:9px">
+            <span class="dt-eyebrow">Comparing</span>
+            <div style="display:flex;background:var(--ink-9);border:1px solid var(--ink-7);border-radius:11px;padding:3px">
+              <sc-for list="{{ compareBtns }}" as="cb" hint-placeholder-count="2">
+                <button class="vg-btn" onClick="{{ cb.onClick }}" style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:none;cursor:pointer;font-family:inherit;text-align:left;padding:7px 14px;border-radius:9px;background:{{ cb.bg }};white-space:nowrap">
+                  <span style="font-size:13px;font-weight:600;color:{{ cb.color }};white-space:nowrap">{{ cb.label }}</span>
+                  <span style="font-size:11px;color:{{ cb.subColor }};white-space:nowrap">{{ cb.sub }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:8px;margin-left:auto">
+            <span style="font-size:13px;color:var(--ink-4)">Visual difference</span>
+            <span style="font-size:30px;font-weight:800;letter-spacing:-.02em;color:{{ compareDiffColor }};line-height:1">{{ compareDiff }}</span>
+          </div>
+        </div>
+
+        <!-- main grid -->
+        <div style="flex:1;display:grid;grid-template-columns:1fr 344px;gap:18px;padding:16px 28px 110px;align-items:start">
+          <!-- LEFT: viewer + code -->
+          <div style="display:flex;flex-direction:column;gap:16px;min-width:0">
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;overflow:hidden">
+              <!-- mode toolbar -->
+              <div style="display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--ink-8);flex-wrap:wrap">
+                <div style="display:flex;gap:4px">
+                  <sc-for list="{{ diffModes }}" as="md" hint-placeholder-count="4">
+                    <button class="vg-btn" onClick="{{ md.onClick }}" style="display:flex;align-items:center;gap:6px;border:1px solid {{ md.border }};background:{{ md.bg }};color:{{ md.color }};cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 11px;border-radius:8px"><i data-lucide="{{ md.icon }}" style="font-size:14px"></i>{{ md.label }}</button>
+                  </sc-for>
+                </div>
+                <button class="vg-btn" onClick="{{ onToggleHl }}" style="margin-left:auto;display:flex;align-items:center;gap:7px;border:1px solid {{ hlBorder }};background:{{ hlBg }};color:{{ hlColor }};cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:600;padding:7px 12px;border-radius:8px"><span style="width:11px;height:11px;border-radius:3px;background:#FF1F8E"></span>Diff highlight</button>
+              </div>
+
+              <!-- slider row (overlay/swipe) -->
+              <sc-if value="{{ m_overlay }}" hint-placeholder-val="">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--ink-8);background:var(--ink-9)">
+                  <span style="font-size:12px;color:var(--ink-4);min-width:84px">After opacity</span>
+                  <input type="range" min="0" max="100" value="{{ overlay }}" onInput="{{ onOverlay }}" style="flex:1;accent-color:var(--ink-1)">
+                  <span style="font-size:12px;font-weight:600;color:var(--ink-2);width:38px;text-align:right">{{ overlayPct }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ m_swipe }}" hint-placeholder-val="">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 16px;border-bottom:1px solid var(--ink-8);background:var(--ink-9)">
+                  <span style="font-size:12px;color:var(--ink-4);min-width:84px">Divider</span>
+                  <input type="range" min="0" max="100" value="{{ swipe }}" onInput="{{ onSwipe }}" style="flex:1;accent-color:var(--ink-1)">
+                  <span style="font-size:12px;font-weight:600;color:var(--ink-2);width:38px;text-align:right">{{ swipePct }}</span>
+                </div>
+              </sc-if>
+
+              <!-- viewer body -->
+              <div style="padding:18px;background:var(--ink-9)">
+                <sc-if value="{{ m_side }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;gap:14px;height:440px">
+                    <div style="flex:1"><dc-import name="Shot" label="Before · checkpoint" show-cta="{{ true }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div>
+                    <div style="flex:1"><dc-import name="Shot" label="After · capture" show-cta="{{ false }}" hl="{{ highlight }}" hint-size="100%,100%"></dc-import></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m_overlay }}" hint-placeholder-val="">
+                  <div style="position:relative;height:440px;max-width:560px;margin:0 auto">
+                    <div style="position:absolute;inset:0"><dc-import name="Shot" label="Before" show-cta="{{ true }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div>
+                    <div style="position:absolute;inset:0;opacity:{{ overlayOpacity }}"><dc-import name="Shot" label="After" show-cta="{{ false }}" hl="{{ highlight }}" hint-size="100%,100%"></dc-import></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m_swipe }}" hint-placeholder-val="">
+                  <div style="position:relative;height:440px;max-width:560px;margin:0 auto;overflow:hidden;border-radius:8px">
+                    <div style="position:absolute;inset:0"><dc-import name="Shot" label="Before" show-cta="{{ true }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div>
+                    <div style="position:absolute;inset:0;clip-path:inset({{ swipeInset }})"><dc-import name="Shot" label="After" show-cta="{{ false }}" hl="{{ highlight }}" hint-size="100%,100%"></dc-import></div>
+                    <div style="position:absolute;top:0;bottom:0;left:{{ swipeLeft }};width:2px;background:#FF1F8E;box-shadow:0 0 0 1px rgba(255,255,255,.6)"></div>
+                    <div style="position:absolute;top:50%;left:{{ swipeLeft }};transform:translate(-50%,-50%);width:28px;height:28px;border-radius:999px;background:#fff;border:2px solid #FF1F8E;display:flex;align-items:center;justify-content:center"><i data-lucide="chevrons-left-right" style="font-size:14px;color:#FF1F8E"></i></div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m_3up }}" hint-placeholder-val="">
+                  <div style="display:flex;gap:12px;height:400px">
+                    <div style="flex:1"><dc-import name="Shot" label="Baseline" show-cta="{{ true }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div>
+                    <div style="flex:1"><dc-import name="Shot" label="Checkpoint" show-cta="{{ true }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div>
+                    <div style="flex:1"><dc-import name="Shot" label="Capture" show-cta="{{ false }}" hl="{{ highlight }}" hint-size="100%,100%"></dc-import></div>
+                  </div>
+                </sc-if>
+              </div>
+              <div style="display:flex;align-items:center;gap:14px;padding:10px 16px;border-top:1px solid var(--ink-8);font-size:12px;color:var(--ink-5)">
+                <span style="display:inline-flex;align-items:center;gap:5px"><i data-lucide="maximize-2" style="font-size:13px"></i> Fit to width</span>
+                <span style="display:inline-flex;align-items:center;gap:5px;cursor:pointer" class="vg-link"><i data-lucide="scan-search" style="font-size:13px"></i> Focus a region</span>
+                <span style="margin-left:auto">Full-page · 1440 × 4,820px · scroll-synced</span>
+              </div>
+            </div>
+
+            <!-- code diff -->
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:4px;padding:4px 14px 0;border-bottom:1px solid var(--ink-8)">
+                <sc-for list="{{ codeTabs }}" as="ct" hint-placeholder-count="2">
+                  <button class="vg-btn" onClick="{{ ct.onClick }}" style="border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:{{ ct.color }};padding:10px 12px;border-bottom:2px solid {{ ct.border }};margin-bottom:-1px">{{ ct.label }}</button>
+                </sc-for>
+                <sc-if value="{{ codeIsDom }}" hint-placeholder-val="">
+                  <span style="margin-left:8px;font-size:11px;color:var(--ink-5);background:var(--ink-9);border:1px solid var(--ink-7);padding:2px 8px;border-radius:999px">normalised — volatile attrs stripped</span>
+                </sc-if>
+              </div>
+              <div style="font-family:var(--font-mono);font-size:12.5px;line-height:1.7;padding:6px 0">
+                <sc-if value="{{ codeIsHtml }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:1px 16px;color:var(--ink-4)">&nbsp;&nbsp;&lt;section class="hero"&gt;</div>
+                  <div style="padding:1px 16px;color:var(--ink-4)">&nbsp;&nbsp;&nbsp;&nbsp;&lt;h1&gt;Maximise your web potential.&lt;/h1&gt;</div>
+                  <div style="padding:1px 16px;background:rgba(192,50,43,.08);color:#992822">−&nbsp;&nbsp;&nbsp;&lt;a class="btn btn--primary" href="/contact"&gt;Get a quote&lt;/a&gt;</div>
+                  <div style="padding:1px 16px;background:rgba(26,143,95,.08);color:#0F6B45">+&nbsp;&nbsp;&nbsp;&lt;a class="btn" href="/contact"&gt;Contact&lt;/a&gt;</div>
+                  <div style="padding:1px 16px;color:var(--ink-4)">&nbsp;&nbsp;&nbsp;&nbsp;&lt;p class="hero__sub"&gt;Your partners in development.&lt;/p&gt;</div>
+                  <div style="padding:1px 16px;color:var(--ink-4)">&nbsp;&nbsp;&lt;/section&gt;</div>
+                </sc-if>
+                <sc-if value="{{ codeIsDom }}" hint-placeholder-val="">
+                  <div style="padding:1px 16px;color:var(--ink-4)">&nbsp;&nbsp;div.hero &gt; div.hero__inner</div>
+                  <div style="padding:1px 16px;background:rgba(192,50,43,.08);color:#992822">−&nbsp;&nbsp;a.btn.btn--primary "Get a quote"</div>
+                  <div style="padding:1px 16px;background:rgba(26,143,95,.08);color:#0F6B45">+&nbsp;&nbsp;a.btn "Contact"</div>
+                  <div style="padding:1px 16px;color:var(--ink-4)">&nbsp;&nbsp;&nbsp;&nbsp;computed: display:inline-flex → inline-block</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT: lighthouse + claude -->
+          <div style="display:flex;flex-direction:column;gap:16px">
+            <!-- lighthouse -->
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px"><i data-lucide="gauge" style="font-size:16px;color:var(--ink-3)"></i><span style="font-size:14px;font-weight:600;color:var(--ink-1)">Lighthouse</span><span style="font-size:12px;color:var(--ink-5);margin-left:auto">baseline → current</span></div>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <sc-for list="{{ lighthouse }}" as="lh" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:10px">
+                    <span style="flex:1;font-size:13px;color:var(--ink-3)">{{ lh.cat }}</span>
+                    <span style="font-size:13px;color:var(--ink-5)">{{ lh.base }}</span>
+                    <i data-lucide="arrow-right" style="font-size:12px;color:var(--ink-6)"></i>
+                    <span style="font-size:14px;font-weight:700;color:var(--ink-1);width:26px;text-align:right">{{ lh.cur }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:600;color:{{ lh.deltaColor }};width:38px;justify-content:flex-end"><i data-lucide="{{ lh.arrow }}" style="font-size:12px"></i>{{ lh.deltaStr }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- claude assessment -->
+            <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:18px 20px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px"><i data-lucide="sparkles" style="font-size:16px;color:var(--ink-2)"></i><span style="font-size:14px;font-weight:600;color:var(--ink-1)">Claude assessment</span></div>
+
+              <sc-if value="{{ notAssessed }}" hint-placeholder-val="{{ true }}">
+                <p style="font-size:12.5px;color:var(--ink-5);margin:6px 0 14px;line-height:1.5">Send the before, after, diff overlay and code changes to Claude for a severity read and a recommendation. Manual — it uses the Anthropic API.</p>
+                <button class="vg-btn" onClick="{{ onAskClaude }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;height:42px;border-radius:10px;border:1px solid var(--ink-2);background:var(--ink-1);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer"><i data-lucide="sparkles" style="font-size:16px"></i> Ask Claude</button>
+              </sc-if>
+
+              <sc-if value="{{ assessing }}" hint-placeholder-val="">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:26px 0">
+                  <div style="width:26px;height:26px;border-radius:999px;border:2.5px solid var(--ink-7);border-top-color:var(--ink-1);animation:vg-spin .8s linear infinite"></div>
+                  <span style="font-size:13px;color:var(--ink-4)">Assessing the change…</span>
+                </div>
+              </sc-if>
+
+              <sc-if value="{{ assessed }}" hint-placeholder-val="">
+                <div style="display:inline-flex;align-items:center;gap:7px;margin:10px 0 12px;padding:5px 12px;border-radius:999px;background:rgba(192,50,43,.10);color:#C0322B;font-size:12.5px;font-weight:700"><i data-lucide="alert-triangle" style="font-size:14px"></i> Likely regression</div>
+                <p style="font-size:13.5px;font-weight:600;color:var(--ink-1);margin:0 0 6px;line-height:1.45">The primary hero call-to-action button was removed.</p>
+                <p style="font-size:12.5px;color:var(--ink-4);margin:0 0 12px;line-height:1.55">The "Get a quote" button is gone from the hero and the link lost its <code style="font-family:var(--font-mono)">btn--primary</code> class — likely an unintended template override from the theme update. This is a conversion-critical element, not routine content drift.</p>
+                <div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--ink-5);margin-bottom:6px">AFFECTED AREAS</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+                  <span style="font-size:12px;color:var(--ink-3);background:var(--ink-9);padding:3px 9px;border-radius:7px">Hero CTA</span>
+                  <span style="font-size:12px;color:var(--ink-3);background:var(--ink-9);padding:3px 9px;border-radius:7px">Button styling</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:9px;padding:11px 13px;background:rgba(192,50,43,.06);border:1px solid rgba(192,50,43,.2);border-radius:10px">
+                  <i data-lucide="flag" style="font-size:16px;color:#C0322B"></i>
+                  <div style="font-size:12.5px;color:var(--ink-2)"><strong style="color:#992822">Recommended: Investigate</strong> — don't accept this as the new baseline.</div>
+                </div>
+                <button class="vg-btn vg-link" onClick="{{ onAskClaude }}" style="margin-top:10px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:12px;color:var(--ink-5);padding:0;display:flex;align-items:center;gap:5px"><i data-lucide="refresh-cw" style="font-size:12px"></i> Re-assess</button>
+              </sc-if>
+            </div>
+          </div>
+        </div>
+
+        <!-- decision bar -->
+        <div style="position:sticky;bottom:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(12px);border-top:1px solid var(--ink-7);padding:14px 28px;display:flex;align-items:center;gap:12px">
+          <sc-if value="{{ assessed }}" hint-placeholder-val="">
+            <div style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:9px;background:rgba(192,50,43,.08);color:#992822;font-size:13px;font-weight:600"><i data-lucide="flag" style="font-size:15px"></i> Recommended: Investigate</div>
+          </sc-if>
+          <button class="vg-btn" onClick="{{ onAddMask }}" style="display:flex;align-items:center;gap:7px;height:42px;padding:0 15px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-3);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer"><i data-lucide="eye-off" style="font-size:16px"></i> Add region to ignore mask</button>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:10px">
+            <button class="vg-btn" onClick="{{ onKeepFlag }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;border:1px solid var(--ink-2);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:14px;font-weight:600;cursor:pointer"><i data-lucide="flag" style="font-size:16px"></i> Keep old &amp; flag <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--ink-8);border:1px solid var(--ink-6);border-radius:4px;padding:1px 6px;margin-left:2px">K</kbd></button>
+            <button class="vg-btn" onClick="{{ onAccept }}" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 18px;border-radius:11px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer"><i data-lucide="check" style="font-size:16px"></i> Accept new as baseline <kbd style="font-family:var(--font-mono);font-size:11px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:1px 6px;margin-left:2px">A</kbd></button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ INVESTIGATIONS ============ -->
+    <sc-if value="{{ r_investigations }}" hint-placeholder-val="">
+      <div style="padding:34px 40px 60px;max-width:1100px">
+        <div class="dt-eyebrow" style="margin-bottom:8px">Cross-client queue</div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:22px">
+          <h1 style="font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0">Investigations</h1>
+          <div style="display:flex;gap:8px">
+            <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border:1px solid var(--ink-7);border-radius:9px;background:var(--ink-10);font-size:13px;color:var(--ink-3)"><i data-lucide="filter" style="font-size:14px"></i> All clients</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 13px;border:1px solid var(--ink-7);border-radius:9px;background:var(--ink-10);font-size:13px;color:var(--ink-3)">All severities <i data-lucide="chevron-down" style="font-size:14px"></i></span>
+          </div>
+        </div>
+
+        <sc-if value="{{ hasInvestigations }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <sc-for list="{{ investigations }}" as="iv" hint-placeholder-count="2">
+              <div class="vg-card-hover" onClick="{{ iv.onOpen }}" style="display:flex;gap:16px;background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:16px;cursor:pointer">
+                <div style="width:108px;height:72px;flex:none;border-radius:8px;background:var(--ink-9);border:1px solid var(--ink-7);position:relative;overflow:hidden"><div style="position:absolute;top:14px;left:16px;width:40px;height:14px;background:#FF1F8E;border-radius:3px;opacity:.85"></div><div style="position:absolute;bottom:16px;right:14px;width:22px;height:22px;background:#FF1F8E;border-radius:3px;opacity:.85"></div></div>
+                <div style="flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:5px">
+                    <div style="width:24px;height:24px;border-radius:6px;background:var(--ink-1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">{{ iv.initials }}</div>
+                    <span style="font-size:14.5px;font-weight:600;color:var(--ink-1)">{{ iv.client }}</span>
+                    <span style="color:var(--ink-6)">·</span>
+                    <span style="font-size:14px;color:var(--ink-3)">{{ iv.page }}</span>
+                    <span style="font-size:12px;color:var(--ink-5);background:var(--ink-9);padding:2px 8px;border-radius:6px">{{ iv.vp }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:rgba(192,50,43,.10);color:{{ iv.sevColor }}"><span style="width:7px;height:7px;border-radius:999px;background:{{ iv.sevColor }}"></span>{{ iv.sevLabel }}</span>
+                  </div>
+                  <p style="font-size:13px;color:var(--ink-4);margin:0 0 8px;line-height:1.5">{{ iv.note }}</p>
+                  <div style="display:flex;align-items:center;gap:14px;font-size:12px;color:var(--ink-5)">
+                    <span>Flagged {{ iv.flaggedAt }}</span><span>by {{ iv.by }}</span><span style="font-weight:700;color:#C0322B">{{ iv.diff }} diff</span>
+                  </div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ GLOBAL SETTINGS ============ -->
+    <sc-if value="{{ r_settings }}" hint-placeholder-val="">
+      <div style="padding:34px 40px 60px;max-width:680px">
+        <div class="dt-eyebrow" style="margin-bottom:8px">Global</div>
+        <h1 style="font-size:30px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0 0 22px">Settings</h1>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><i data-lucide="users" style="font-size:16px;color:var(--ink-3)"></i><span style="font-size:15px;font-weight:600;color:var(--ink-1)">Team &amp; access</span></div>
+            <p style="font-size:13px;color:var(--ink-5);margin:0 0 14px;line-height:1.5">Sign-in is restricted to the <strong style="color:var(--ink-2)">digitaltreasury.com.au</strong> Google Workspace. Anyone in the workspace can sign in.</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0"><div style="width:28px;height:28px;border-radius:999px;background:var(--ink-1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">SK</div><span style="font-size:13.5px;color:var(--ink-2)">Sara Keating</span><span style="font-size:12px;color:var(--ink-5);margin-left:auto">last seen today</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--ink-8)"><div style="width:28px;height:28px;border-radius:999px;background:var(--ink-1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600">TM</div><span style="font-size:13.5px;color:var(--ink-2)">Tom Mercer</span><span style="font-size:12px;color:var(--ink-5);margin-left:auto">last seen today</span></div>
+            </div>
+          </div>
+
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><i data-lucide="key-round" style="font-size:16px;color:var(--ink-3)"></i><span style="font-size:15px;font-weight:600;color:var(--ink-1)">Anthropic API key</span><span style="display:inline-flex;align-items:center;gap:5px;margin-left:auto;font-size:12px;font-weight:600;color:#1A8F5F"><span style="width:7px;height:7px;border-radius:999px;background:#1A8F5F"></span>Connected</span></div>
+            <p style="font-size:13px;color:var(--ink-5);margin:0 0 14px;line-height:1.5">Powers the manual "Ask Claude" assessments. Assessments are never automatic — each one is an explicit, billable request.</p>
+            <div style="display:flex;gap:9px">
+              <div style="flex:1;display:flex;align-items:center;gap:9px;height:40px;padding:0 13px;border:1px solid var(--ink-7);border-radius:10px;font-family:var(--font-mono);font-size:13px;color:var(--ink-3)">sk-ant-··········································4f2a</div>
+              <button class="vg-btn" style="height:40px;padding:0 14px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">Test connection</button>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:14px">
+            <div style="flex:1;background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+              <div style="font-size:14px;font-weight:600;color:var(--ink-1);margin-bottom:5px">Default diff threshold</div>
+              <p style="font-size:12.5px;color:var(--ink-5);margin:0 0 13px;line-height:1.5">Clients can override this.</p>
+              <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--ink-7);border-radius:10px;font-size:14px;font-weight:600;color:var(--ink-1)">1.0 <span style="color:var(--ink-5);font-weight:400">%</span></div>
+            </div>
+            <div style="flex:1;background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+              <div style="font-size:14px;font-weight:600;color:var(--ink-1);margin-bottom:5px">Retention cap</div>
+              <p style="font-size:12.5px;color:var(--ink-5);margin:0 0 13px;line-height:1.5">Caps any per-client setting.</p>
+              <div style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 14px;border:1px solid var(--ink-7);border-radius:10px;font-size:14px;font-weight:600;color:var(--ink-1)">90 <span style="color:var(--ink-5);font-weight:400">days</span></div>
+            </div>
+          </div>
+
+          <div style="background:var(--ink-10);border:1px solid var(--ink-7);border-radius:14px;padding:22px 24px">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px"><i data-lucide="bell" style="font-size:16px;color:var(--ink-3)"></i><span style="font-size:15px;font-weight:600;color:var(--ink-1)">Notification defaults</span></div>
+            <p style="font-size:13px;color:var(--ink-5);margin:0 0 14px;line-height:1.5">Default behaviour for new clients · from-address <strong style="color:var(--ink-2)">vigil@digitaltreasury.com.au</strong>.</p>
+            <div style="display:flex;align-items:center;gap:9px"><span style="font-size:13px;color:var(--ink-3)">Email only when a run finds changes</span><div style="margin-left:auto;width:44px;height:26px;border-radius:999px;background:var(--ink-1);position:relative;cursor:pointer"><div style="position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:999px;background:#fff"></div></div></div>
+            <button class="vg-btn vg-link" onClick="{{ onPreviewEmail }}" style="margin-top:14px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;color:var(--ink-3);padding:0;display:flex;align-items:center;gap:6px"><i data-lucide="mail" style="font-size:15px"></i> Preview notification email</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ EMAIL TEMPLATE ============ -->
+    <sc-if value="{{ r_email }}" hint-placeholder-val="">
+      <div style="padding:34px 40px 60px;max-width:760px">
+        <button class="vg-btn vg-link" onClick="{{ navItems.0.onClick }}" style="display:inline-flex;align-items:center;gap:6px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;color:var(--ink-4);padding:0;margin-bottom:16px"><i data-lucide="chevron-left" style="font-size:15px"></i> Dashboard</button>
+        <div class="dt-eyebrow" style="margin-bottom:8px">Notification template</div>
+        <h1 style="font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1);margin:0 0 20px">Email — changes found</h1>
+        <div style="background:var(--ink-9);border:1px solid var(--ink-7);border-radius:16px;padding:30px">
+          <div style="max-width:480px;margin:0 auto;background:#fff;border:1px solid var(--ink-7);border-radius:12px;overflow:hidden">
+            <div style="padding:24px 28px 0"><div style="font-size:12px;color:var(--ink-5);margin-bottom:18px">Subject: <span style="color:var(--ink-2);font-weight:600">Vigil — Edimark: 2 pages changed</span></div></div>
+            <div style="padding:0 28px 28px;text-align:center">
+              <div style="display:flex;align-items:center;justify-content:center;gap:9px;padding:8px 0 22px"><svg viewBox="0 0 107.72 53.86" style="width:20px;height:auto"><path d="m0,0h26.93C41.79,0,53.86,12.07,53.86,26.93h0c0,14.86-12.07,26.93-26.93,26.93H0V0H0Z" fill="#0A0A0A"/><rect x="53.86" width="53.86" height="19.84" fill="#0A0A0A"/></svg><span style="font-size:16px;font-weight:700;letter-spacing:-.02em;color:var(--ink-1)">Vigil</span></div>
+              <h2 style="font-size:19px;font-weight:700;color:var(--ink-1);margin:0 0 6px;letter-spacing:-.01em">2 of 11 pages have changes</h2>
+              <p style="font-size:13.5px;color:var(--ink-4);margin:0 0 22px;line-height:1.55">Edimark · run finished today at 9:21am.<br>Two pages are over threshold and awaiting your review.</p>
+              <div style="display:flex;gap:8px;justify-content:center;margin-bottom:24px">
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--ink-9);padding:6px 12px;border-radius:8px"><span style="width:7px;height:7px;border-radius:999px;background:#1A8F5F"></span>9 passed</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#7A5208;background:rgba(180,122,18,.10);padding:6px 12px;border-radius:8px"><span style="width:7px;height:7px;border-radius:999px;background:#B47A12"></span>2 changes</span>
+                <span style="display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--ink-4);background:var(--ink-9);padding:6px 12px;border-radius:8px"><span style="width:7px;height:7px;border-radius:999px;background:var(--ink-5)"></span>0 broken</span>
+              </div>
+              <a href="#" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;height:46px;border-radius:10px;background:#0A0A0A;color:#fff;font-size:14px;font-weight:600;text-decoration:none">Review run →</a>
+            </div>
+            <div style="border-top:1px solid var(--ink-8);padding:14px 28px;text-align:center"><span style="font-size:11px;color:var(--ink-5)">Digital Treasury · you're on the Edimark notify list</span></div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ MODALS ============ -->
+    <sc-if value="{{ m_addClient }}" hint-placeholder-val="">
+      <div onClick="{{ onCloseModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(10,10,10,.58);display:flex;align-items:center;justify-content:center;padding:24px">
+        <div onClick="{{ stop }}" style="width:100%;max-width:480px;background:var(--ink-10);border-radius:16px;box-shadow:var(--shadow-3);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--ink-8)"><h3 style="font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--ink-1);margin:0">Add client</h3><i data-lucide="x" onClick="{{ onCloseModal }}" style="font-size:18px;color:var(--ink-5);cursor:pointer"></i></div>
+          <div style="padding:22px 24px;display:flex;flex-direction:column;gap:16px">
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">CLIENT NAME</label><div style="height:42px;display:flex;align-items:center;padding:0 13px;border:1px solid var(--ink-7);border-radius:10px;font-size:14px;color:var(--ink-2)">Northbridge Dental</div></div>
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">PRIMARY URL</label><div style="height:42px;display:flex;align-items:center;padding:0 13px;border:1px solid var(--ink-7);border-radius:10px;font-size:14px;color:var(--ink-2);font-family:var(--font-mono)">https://northbridgedental.com.au</div></div>
+            <div style="display:flex;gap:14px">
+              <div style="flex:1"><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">LOGO (OPTIONAL)</label><div style="height:42px;display:flex;align-items:center;gap:8px;padding:0 13px;border:1px dashed var(--ink-6);border-radius:10px;font-size:13px;color:var(--ink-5);cursor:pointer"><i data-lucide="upload" style="font-size:15px"></i> Upload</div></div>
+              <div style="flex:1"><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">SCHEDULE</label><div style="height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;border:1px solid var(--ink-7);border-radius:10px;font-size:13px;color:var(--ink-4)">Set later <i data-lucide="chevron-down" style="font-size:15px"></i></div></div>
+            </div>
+            <div><label style="display:block;font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">NOTIFY EMAILS</label><div style="min-height:42px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;padding:6px 10px;border:1px solid var(--ink-7);border-radius:10px"><span style="display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 5px 0 10px;border-radius:999px;background:var(--ink-8);font-size:12.5px;color:var(--ink-2)">sara@digitaltreasury.com.au <i data-lucide="x" style="font-size:13px;color:var(--ink-5)"></i></span><span style="font-size:13px;color:var(--ink-5)">add email…</span></div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--ink-8)"><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 18px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Add client &amp; capture pages</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ m_csv }}" hint-placeholder-val="">
+      <div onClick="{{ onCloseModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(10,10,10,.58);display:flex;align-items:center;justify-content:center;padding:24px">
+        <div onClick="{{ stop }}" style="width:100%;max-width:560px;background:var(--ink-10);border-radius:16px;box-shadow:var(--shadow-3);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--ink-8)"><h3 style="font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--ink-1);margin:0">Import pages from CSV</h3><i data-lucide="x" onClick="{{ onCloseModal }}" style="font-size:18px;color:var(--ink-5);cursor:pointer"></i></div>
+          <div style="padding:22px 24px">
+            <div style="border:1.5px dashed var(--ink-6);border-radius:12px;padding:24px;text-align:center;background:var(--ink-9);margin-bottom:8px"><i data-lucide="file-up" style="font-size:26px;color:var(--ink-4)"></i><div style="font-size:13.5px;font-weight:600;color:var(--ink-2);margin-top:8px">pages.csv · 6 rows parsed</div><div style="font-size:12px;color:var(--ink-5);margin-top:3px">Expected format — <code style="font-family:var(--font-mono)">label,url,viewports?</code></div></div>
+            <div style="font-size:12px;font-weight:600;color:var(--ink-4);margin:16px 0 8px">PREVIEW</div>
+            <div style="border:1px solid var(--ink-7);border-radius:10px;overflow:hidden">
+              <div style="display:grid;grid-template-columns:1fr 1.6fr auto;gap:12px;padding:8px 14px;background:var(--ink-9);border-bottom:1px solid var(--ink-7);font-size:11px;font-weight:600;color:var(--ink-5);text-transform:uppercase">
+                <span>Label</span><span>URL</span><span></span>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1.6fr auto;gap:12px;padding:9px 14px;border-bottom:1px solid var(--ink-8);font-size:13px;align-items:center"><span style="color:var(--ink-2)">Homepage</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-4)">/</span><i data-lucide="check" style="font-size:15px;color:#1A8F5F"></i></div>
+              <div style="display:grid;grid-template-columns:1fr 1.6fr auto;gap:12px;padding:9px 14px;border-bottom:1px solid var(--ink-8);font-size:13px;align-items:center"><span style="color:var(--ink-2)">Services</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-4)">/services</span><i data-lucide="check" style="font-size:15px;color:#1A8F5F"></i></div>
+              <div style="display:grid;grid-template-columns:1fr 1.6fr auto;gap:12px;padding:9px 14px;border-bottom:1px solid var(--ink-8);font-size:13px;align-items:center;background:rgba(192,50,43,.05)"><span style="color:var(--ink-2)">Pricing</span><span style="font-family:var(--font-mono);font-size:12px;color:#C0322B">pricing (missing /)</span><span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:#C0322B"><i data-lucide="alert-circle" style="font-size:14px"></i>invalid</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1.6fr auto;gap:12px;padding:9px 14px;font-size:13px;align-items:center"><span style="color:var(--ink-2)">Contact</span><span style="font-family:var(--font-mono);font-size:12px;color:var(--ink-4)">/contact</span><i data-lucide="check" style="font-size:15px;color:#1A8F5F"></i></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:10px;font-size:12.5px;color:var(--ink-4)"><i data-lucide="info" style="font-size:14px"></i> 5 valid · 1 invalid row will be skipped.</div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--ink-8)"><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 18px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Import 5 pages</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ m_accept }}" hint-placeholder-val="">
+      <div onClick="{{ onCloseModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(10,10,10,.58);display:flex;align-items:center;justify-content:center;padding:24px">
+        <div onClick="{{ stop }}" style="width:100%;max-width:600px;background:var(--ink-10);border-radius:16px;box-shadow:var(--shadow-3);overflow:hidden">
+          <div style="padding:22px 24px 16px"><div style="display:flex;align-items:center;gap:9px;margin-bottom:5px"><i data-lucide="alert-triangle" style="font-size:18px;color:#B47A12"></i><h3 style="font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--ink-1);margin:0">Overwrite the baseline?</h3></div><p style="font-size:13.5px;color:var(--ink-4);margin:0;line-height:1.5">The current capture becomes the new accepted-good reference for <strong style="color:var(--ink-2)">Homepage · Desktop</strong>. The old baseline will be replaced.</p></div>
+          <div style="display:flex;gap:14px;padding:0 24px 20px">
+            <div style="flex:1"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:var(--ink-5);margin-bottom:7px">CURRENT BASELINE</div><div style="height:150px"><dc-import name="Shot" label="Old" show-cta="{{ true }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div></div>
+            <div style="display:flex;align-items:center;color:var(--ink-5)"><i data-lucide="arrow-right" style="font-size:20px"></i></div>
+            <div style="flex:1"><div style="font-size:11px;font-weight:600;letter-spacing:.05em;color:#7A5208;margin-bottom:7px">NEW BASELINE</div><div style="height:150px"><dc-import name="Shot" label="New" show-cta="{{ false }}" hl="{{ false }}" hint-size="100%,100%"></dc-import></div></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--ink-8)"><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button><button class="vg-btn" onClick="{{ onConfirmAccept }}" style="height:40px;padding:0 18px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Accept new baseline</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ m_flagged }}" hint-placeholder-val="">
+      <div onClick="{{ onCloseModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(10,10,10,.58);display:flex;align-items:center;justify-content:center;padding:24px">
+        <div onClick="{{ stop }}" style="width:100%;max-width:440px;background:var(--ink-10);border-radius:16px;box-shadow:var(--shadow-3);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--ink-8)"><h3 style="font-size:17px;font-weight:700;color:var(--ink-1);margin:0">Flag for investigation</h3><i data-lucide="x" onClick="{{ onCloseModal }}" style="font-size:18px;color:var(--ink-5);cursor:pointer"></i></div>
+          <div style="padding:20px 24px"><p style="font-size:13px;color:var(--ink-4);margin:0 0 14px;line-height:1.5">The old baseline is kept. This page moves to the cross-client Investigations queue.</p><div style="font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">NOTE</div><div style="min-height:72px;padding:11px 13px;border:1px solid var(--ink-7);border-radius:10px;font-size:13px;color:var(--ink-4);line-height:1.5">Hero CTA missing after theme update — needs a dev to check the template override.</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--ink-8)"><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 18px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Keep old &amp; flag</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ m_mask }}" hint-placeholder-val="">
+      <div onClick="{{ onCloseModal }}" style="position:fixed;inset:0;z-index:50;background:rgba(10,10,10,.58);display:flex;align-items:center;justify-content:center;padding:24px">
+        <div onClick="{{ stop }}" style="width:100%;max-width:440px;background:var(--ink-10);border-radius:16px;box-shadow:var(--shadow-3);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--ink-8)"><h3 style="font-size:17px;font-weight:700;color:var(--ink-1);margin:0">Add region to ignore mask</h3><i data-lucide="x" onClick="{{ onCloseModal }}" style="font-size:18px;color:var(--ink-5);cursor:pointer"></i></div>
+          <div style="padding:20px 24px"><p style="font-size:13px;color:var(--ink-4);margin:0 0 14px;line-height:1.5">Exclude a region from the visual diff on this page going forward. Useful for areas that legitimately change.</p><div style="font-size:12px;font-weight:600;color:var(--ink-4);margin-bottom:7px">CSS SELECTOR</div><div style="display:flex;align-items:center;gap:9px;height:42px;padding:0 13px;border:1px solid var(--ink-7);border-radius:10px;font-family:var(--font-mono);font-size:13px;color:var(--ink-2)"><i data-lucide="eye-off" style="font-size:15px;color:var(--ink-5)"></i> .hero__headline</div></div>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--ink-8)"><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 16px;border-radius:10px;border:1px solid var(--ink-7);background:var(--ink-10);color:var(--ink-1);font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Cancel</button><button class="vg-btn" onClick="{{ onCloseModal }}" style="height:40px;padding:0 18px;border-radius:10px;border:none;background:var(--ink-0);color:#fff;font-family:inherit;font-size:13.5px;font-weight:600;cursor:pointer">Add mask</button></div>
+        </div>
+      </div>
+    </sc-if>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STATUS = {
+  passed:   {label:'Passed',            color:'#1A8F5F', bg:'rgba(26,143,95,.10)'},
+  changes:  {label:'Changes found',     color:'#B47A12', bg:'rgba(180,122,18,.12)'},
+  broken:   {label:'Likely regression', color:'#C0322B', bg:'rgba(192,50,43,.10)'},
+  running:  {label:'Running',           color:'#2F6FB0', bg:'rgba(47,111,176,.10)'},
+  resolved: {label:'Resolved',          color:'#6B6B6B', bg:'rgba(107,107,107,.10)'},
+  error:    {label:'Capture failed',    color:'#C0322B', bg:'rgba(192,50,43,.10)'},
+};
+const SEV = {
+  intentional:{label:'Intentional change', color:'#1A8F5F'},
+  minor:      {label:'Minor cosmetic',     color:'#B47A12'},
+  regression: {label:'Likely regression',  color:'#C0322B'},
+  broken:     {label:'Broken',             color:'#8E1F1A'},
+};
+const CLIENTS = [
+  {id:'meridian',   name:'Meridian Health',       url:'meridianhealth.com.au',    initials:'MH', pages:9,  status:'broken',  lastRun:'1 broken · 8 passed', lastRunAt:'Today 7:40am', next:'Wed 06:00', awaiting:1},
+  {id:'edimark',    name:'Edimark',               url:'edimark.com.au',           initials:'EM', pages:11, status:'changes', lastRun:'2 changes · 9 passed', lastRunAt:'Today 9:21am', next:'Mon 06:00', checkpoint:true, awaiting:2},
+  {id:'coastline',  name:'Coastline Property',    url:'coastlineproperty.com.au', initials:'CP', pages:14, status:'running', lastRun:'Capturing 6 of 14…', lastRunAt:'In progress', next:'—'},
+  {id:'northbridge',name:'Northbridge Dental',    url:'northbridgedental.com.au', initials:'ND', pages:8,  status:'passed',  lastRun:'8 passed', lastRunAt:'Today 6:02am',  next:'Mon 06:00'},
+  {id:'harbour',    name:'Harbour Legal',         url:'harbourlegal.com.au',      initials:'HL', pages:6,  status:'passed',  lastRun:'6 passed', lastRunAt:'Yesterday 6:00am', next:'Thu 06:00'},
+  {id:'curio',      name:'Curio Coffee Roasters', url:'curiocoffee.com.au',       initials:'CC', pages:7,  status:'passed',  lastRun:'7 passed', lastRunAt:'Yesterday 6:00am', next:'Fri 06:00'},
+];
+const PAGES = [
+  {id:'home',     label:'Homepage',   url:'/',         vps:['Desktop','Mobile'], status:'changes', diff:'4.1%', baselineAt:'12 Jun · Sara'},
+  {id:'services', label:'Services',   url:'/services', vps:['Desktop'],          status:'passed',  diff:'0.0%', baselineAt:'12 Jun · Sara'},
+  {id:'pricing',  label:'Pricing',    url:'/pricing',  vps:['Desktop','Mobile'], status:'changes', diff:'2.7%', baselineAt:'12 Jun · Tom'},
+  {id:'contact',  label:'Contact',    url:'/contact',  vps:['Desktop'],          status:'passed',  diff:'0.1%', baselineAt:'12 Jun · Sara'},
+  {id:'blog',     label:'Blog index', url:'/blog',     vps:['Desktop'],          status:'passed',  diff:'0.3%', baselineAt:'09 Jun · Tom'},
+  {id:'about',    label:'About',      url:'/about',    vps:['Desktop','Mobile'], status:'error',   diff:'—',    baselineAt:'09 Jun · Sara'},
+];
+const INVESTIGATIONS = [
+  {id:1, client:'Meridian Health', initials:'MH', page:'Homepage', vp:'Desktop', flaggedAt:'Today 7:48am', by:'Tom',  severity:'regression', note:'Hero CTA button vanished after the theme update — likely a template override regression.', diff:'18.4%'},
+  {id:2, client:'Edimark',         initials:'EM', page:'Pricing',  vp:'Mobile',  flaggedAt:'Yesterday 4:10pm', by:'Sara', severity:'minor', note:'Pricing table columns reflowed slightly on mobile. Probably plugin CSS — confirming.', diff:'2.7%'},
+];
+
+class Component extends DCLogic {
+  state = { route:{screen:'login'}, tab:'pages', diffMode:'side', highlight:true,
+            overlay:55, swipe:50, compare:'start', codeTab:'html',
+            assessing:false, assessed:false, modal:null, cpOverride:{}, csvStep:'drop' };
+
+  cpActive(c){ const o=this.state.cpOverride[c.id]; return o===undefined ? !!c.checkpoint : o; }
+  toggleCp(c){ this.setState(s=>({cpOverride:Object.assign({}, s.cpOverride, {[c.id]: !this.cpActive(c)})})); }
+
+  componentDidMount(){ this._icons(); }
+  componentDidUpdate(){ this._icons(); }
+  _icons(){ try{ if(window.lucide) window.lucide.createIcons(); }catch(e){} }
+
+  go(screen, extra){ this.setState({route:Object.assign({screen}, extra||{}), modal:null}); window.scrollTo(0,0); }
+  section(){ const s=this.state.route.screen; if(['investigations'].includes(s))return 'investigations'; if(['settings'].includes(s))return 'settings'; if(s==='login')return ''; return 'dashboard'; }
+  client(){ return CLIENTS.find(c=>c.id===this.state.route.clientId) || CLIENTS[1]; }
+
+  askClaude(){ if(this.state.assessing||this.state.assessed)return; this.setState({assessing:true});
+    setTimeout(()=>this.setState({assessing:false, assessed:true}), 1400); }
+
+  renderVals(){
+    const st=this.state, scr=st.route.screen, sec=this.section();
+    const pill=(s)=>{const d=STATUS[s]||STATUS.resolved; return {statusLabel:d.label, statusColor:d.color, statusBg:d.bg};};
+
+    const nav=(id,icon,label,badge)=>{ const active=sec===id; return {
+      icon, label, badge:badge||'', weight:active?'600':'500',
+      bg: active?'var(--ink-1)':'transparent', color: active?'#fff':'var(--ink-3)',
+      onClick:()=>this.go(id) }; };
+
+    const navItems=[ nav('dashboard','layout-grid','Dashboard'),
+                     nav('investigations','flag','Investigations', INVESTIGATIONS.length),
+                     nav('settings','settings','Settings') ];
+
+    const clients=CLIENTS.map(c=>Object.assign({}, c, pill(c.status), {
+      running:c.status==='running', notRunning:c.status!=='running',
+      onOpen:()=>this.go('client',{clientId:c.id}),
+      onRun:(e)=>{ e.stopPropagation(); this.go('run',{clientId:c.id}); } }));
+
+    const awaiting=CLIENTS.reduce((n,c)=>n+(c.awaiting||0),0);
+    const statCards=[
+      {icon:'building-2',  label:'Active clients',    value:String(CLIENTS.length), valueColor:'var(--ink-1)', accent:'var(--ink-4)'},
+      {icon:'play-circle', label:'Runs today',        value:'3', valueColor:'var(--ink-1)', accent:'var(--ink-4)'},
+      {icon:'eye',         label:'Pages awaiting review', value:String(awaiting), valueColor:'#B47A12', accent:'#B47A12'},
+      {icon:'flag',        label:'Open investigations', value:String(INVESTIGATIONS.length), valueColor:'#C0322B', accent:'#C0322B'},
+    ];
+
+    // ---- current client + inner-screen data ----
+    const c = this.client();
+    const diffColor=(d)=>{ if(d==='—')return '#C0322B'; const n=parseFloat(d); if(isNaN(n)||n===0)return 'var(--ink-4)'; if(n<1)return '#1A8F5F'; if(n<=5)return '#B47A12'; return '#C0322B'; };
+    const cpOn=this.cpActive(c);
+
+    const pages=PAGES.map(p=>Object.assign({}, p, pill(p.status), {
+      vpStr:p.vps.join(' · '), isError:p.status==='error',
+      diffColor:diffColor(p.diff),
+      onOpen:()=>this.go('page',{clientId:c.id, pageId:p.id}),
+      onDiff:()=>this.go('diff',{clientId:c.id, pageId:p.id}) }));
+
+    const clientRuns=[
+      {id:'r1', when:'Today · 9:21am',   trigger:'Maintenance run', icon:'wrench', result:'2 changes · 9 passed', status:'changes'},
+      {id:'r2', when:'Mon · 06:00',      trigger:'Scheduled',       icon:'clock',  result:'11 passed',           status:'passed'},
+      {id:'r3', when:'12 Jun · 2:15pm',  trigger:'Manual',          icon:'hand',   result:'1 change · 10 passed',status:'changes'},
+      {id:'r4', when:'09 Jun · 06:00',   trigger:'Scheduled',       icon:'clock',  result:'11 passed',           status:'passed'},
+    ].map(r=>Object.assign({}, r, pill(r.status), {onOpen:()=>this.go('run',{clientId:c.id})}));
+
+    const runRows=[
+      {label:'Homepage',  vp:'Desktop', status:'changes', vsStart:'0.3%', vsBaseline:'4.1%', lh:'Perf 92→88', lhDown:true},
+      {label:'Pricing',   vp:'Mobile',  status:'changes', vsStart:'2.7%', vsBaseline:'2.7%', lh:'Best 100→92', lhDown:true},
+      {label:'About',     vp:'Desktop', status:'error',   vsStart:'—',    vsBaseline:'—',    lh:'—', lhDown:false},
+      {label:'Services',  vp:'Desktop', status:'passed',  vsStart:'0.0%', vsBaseline:'0.0%', lh:'No change', lhDown:false},
+      {label:'Contact',   vp:'Desktop', status:'passed',  vsStart:'0.1%', vsBaseline:'0.1%', lh:'No change', lhDown:false},
+      {label:'Blog index',vp:'Desktop', status:'passed',  vsStart:'0.0%', vsBaseline:'0.3%', lh:'No change', lhDown:false},
+    ].map(r=>Object.assign({}, r, pill(r.status), {
+      isError:r.status==='error', notError:r.status!=='error',
+      vsStartColor:diffColor(r.vsStart), vsBaselineColor:diffColor(r.vsBaseline),
+      lhColor:r.lhDown?'#C0322B':'var(--ink-5)',
+      onOpen:()=> r.status==='error'?null:this.go('diff',{clientId:c.id, pageId:'home'}) }));
+
+    const tab=st.tab;
+    const tabItem=(id,label)=>({id,label, active:tab===id,
+      color: tab===id?'var(--ink-1)':'var(--ink-4)',
+      border: tab===id?'var(--ink-1)':'transparent', weight:tab===id?'600':'500',
+      onClick:()=>this.setState({tab:id})});
+    const clientTabs=[tabItem('pages','Pages'),tabItem('runs','Runs'),tabItem('schedule','Schedule'),tabItem('settings','Settings')];
+
+    // ---- investigations ----
+    const investigations=INVESTIGATIONS.map(iv=>Object.assign({}, iv, {
+      sevLabel:SEV[iv.severity].label, sevColor:SEV[iv.severity].color,
+      onOpen:()=>this.go('diff',{clientId:'edimark', pageId:'home', fromInv:true}) }));
+
+    // ---- diff review ----
+    const dm=st.diffMode;
+    const modeBtn=(id,icon,label)=>({id,icon,label, active:dm===id,
+      bg: dm===id?'var(--ink-1)':'var(--ink-10)', color: dm===id?'#fff':'var(--ink-3)',
+      border: dm===id?'var(--ink-1)':'var(--ink-7)',
+      onClick:()=>this.setState({diffMode:id})});
+    const diffModes=[modeBtn('side','columns-2','Side by side'),modeBtn('overlay','layers','Overlay'),
+                     modeBtn('swipe','flip-horizontal-2','Swipe'),modeBtn('3up','layout-grid','3-up')];
+
+    const lighthouse=[
+      {cat:'Performance',   base:92, cur:88, delta:-4},
+      {cat:'Accessibility', base:98, cur:98, delta:0},
+      {cat:'Best practices', base:100, cur:92, delta:-8},
+      {cat:'SEO',           base:100, cur:100, delta:0},
+    ].map(l=>({ cat:l.cat, base:l.base, cur:l.cur,
+      deltaStr: l.delta===0?'—':(l.delta>0?'+'+l.delta:String(l.delta)),
+      deltaColor: l.delta===0?'var(--ink-5)':(l.delta>0?'#1A8F5F':'#C0322B'),
+      arrow: l.delta===0?'minus':(l.delta>0?'arrow-up':'arrow-down') }));
+
+    const compareBtn=(id,label,sub)=>({id,label,sub, active:st.compare===id,
+      bg: st.compare===id?'var(--ink-1)':'transparent', color: st.compare===id?'#fff':'var(--ink-3)',
+      subColor: st.compare===id?'rgba(255,255,255,.6)':'var(--ink-5)',
+      onClick:()=>this.setState({compare:id})});
+    const compareDiff = st.compare==='start' ? '0.3%' : '4.1%';
+    const codeTabBtn=(id,label)=>({id,label, active:st.codeTab===id,
+      color: st.codeTab===id?'var(--ink-1)':'var(--ink-5)', border: st.codeTab===id?'var(--ink-1)':'transparent',
+      onClick:()=>this.setState({codeTab:id})});
+
+    return {
+      showRail: scr!=='login',
+      client:c, clientCpOn:cpOn, cpBtnLabel: cpOn?'End checkpoint':'Start checkpoint',
+      onToggleCp:()=>this.toggleCp(c),
+      onClientRunNow:()=>this.go('run',{clientId:c.id}),
+      pages, clientRuns, clientTabs, runRows,
+      tab_pages:tab==='pages', tab_runs:tab==='runs', tab_schedule:tab==='schedule', tab_settings:tab==='settings',
+      investigations, hasInvestigations:INVESTIGATIONS.length>0,
+      diffModes, m_side:dm==='side', m_overlay:dm==='overlay', m_swipe:dm==='swipe', m_3up:dm==='3up',
+      highlight:st.highlight, onToggleHl:()=>this.setState(s=>({highlight:!s.highlight})),
+      hlBg: st.highlight?'rgba(255,31,142,.10)':'var(--ink-10)', hlBorder: st.highlight?'#FF1F8E':'var(--ink-7)', hlColor: st.highlight?'#C2156E':'var(--ink-4)',
+      lighthouse,
+      overlay:st.overlay, onOverlay:(e)=>this.setState({overlay:+e.target.value}), overlayPct:st.overlay+'%', overlayOpacity:(st.overlay/100).toFixed(2),
+      swipe:st.swipe, onSwipe:(e)=>this.setState({swipe:+e.target.value}), swipePct:st.swipe+'%', swipeInset:'0 '+(100-st.swipe)+'% 0 0', swipeLeft:st.swipe+'%',
+      compareBtns:[compareBtn('start','Since you started work','Checkpoint → Capture'),compareBtn('baseline','Since last approved','Baseline → Capture')],
+      compareDiff, compareDiffColor:diffColor(compareDiff),
+      codeTabs:[codeTabBtn('html','Source HTML'),codeTabBtn('dom','Rendered DOM')],
+      codeIsHtml:st.codeTab==='html', codeIsDom:st.codeTab==='dom',
+      assessing:st.assessing, assessed:st.assessed, notAssessed:!st.assessing&&!st.assessed,
+      onAskClaude:()=>this.askClaude(),
+      onAccept:()=>this.setState({modal:'accept'}),
+      onKeepFlag:()=>this.setState({modal:'flagged'}),
+      onAddMask:()=>this.setState({modal:'mask'}),
+      onBackToRun:()=>this.go('run',{clientId:c.id}),
+      modal:st.modal, m_addClient:st.modal==='addClient', m_csv:st.modal==='csv',
+      m_accept:st.modal==='accept', m_flagged:st.modal==='flagged', m_mask:st.modal==='mask',
+      onCloseModal:()=>this.setState({modal:null}),
+      stop:(e)=>{ if(e&&e.stopPropagation) e.stopPropagation(); },
+      onConfirmAccept:()=>this.setState({modal:null, route:Object.assign({},st.route,{screen:'run'})}),
+      onOpenCsv:()=>this.setState({modal:'csv'}),
+      onPreviewEmail:()=>this.go('email'),
+      r_login: scr==='login', r_dashboard: scr==='dashboard', r_client: scr==='client',
+      r_page: scr==='page', r_run: scr==='run', r_diff: scr==='diff',
+      r_investigations: scr==='investigations', r_settings: scr==='settings', r_email: scr==='email',
+      navItems, clients, statCards,
+      onLogin:()=>this.go('dashboard'),
+      onAddClient:()=>this.setState({modal:'addClient'}),
+    };
+  }
+}
+</script>
+</body>
+</html>

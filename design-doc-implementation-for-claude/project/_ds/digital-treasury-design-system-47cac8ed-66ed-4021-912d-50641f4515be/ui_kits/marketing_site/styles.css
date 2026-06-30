@@ -1,0 +1,163 @@
+/* =====================================================================
+   Marketing site UI kit styles — builds on colors_and_type.css tokens.
+   ===================================================================== */
+
+.dt-container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Buttons ---------- */
+.dt-btn {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: var(--r-pill);
+  height: 44px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--dur-base) var(--ease-out);
+  text-decoration: none;
+  line-height: 1;
+}
+.dt-btn--primary        { background: var(--ink-1); color: #fff; }
+.dt-btn--primary:hover  { background: #1F1F1F; transform: translateY(-1px); }
+.dt-btn--primary-dark   { background: #0A0A0A; color: #fff; border-color: #1F1F1F; }
+.dt-btn--primary-dark:hover { background: #1F1F1F; }
+.dt-btn--primary-invert { background: #fff; color: #0A0A0A; }
+.dt-btn--primary-invert:hover { background: #F2F2F2; }
+.dt-btn--outline-dark   { background: transparent; color: #fff; border-color: #fff; }
+.dt-btn--outline-dark:hover { background: #fff; color: #0A0A0A; }
+.dt-btn--outline        { background: #fff; color: #0A0A0A; border-color: #0A0A0A; }
+.dt-btn--outline:hover  { background: #0A0A0A; color: #fff; }
+.dt-btn:active          { transform: scale(0.98); }
+
+.dt-input {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  border: 1px solid var(--ink-6);
+  border-radius: var(--r-md);
+  padding: 12px 14px;
+  background: #fff;
+  color: #0A0A0A;
+  outline: none;
+  width: 100%;
+  transition: box-shadow var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.dt-input:focus { border-color: #0A0A0A; box-shadow: 0 0 0 3px rgba(10,10,10,0.08); }
+
+/* ---------- Nav ---------- */
+.dt-nav {
+  position: sticky; top: 0; z-index: 40;
+  display: flex; align-items: center; gap: 28px;
+  padding: 14px 32px;
+  background: #000;
+  color: #fff;
+}
+.dt-nav__logo {
+  display: inline-flex; align-items: center; gap: 8px;
+  color: #fff; text-decoration: none;
+}
+.dt-nav__logo span { font-size: 13px; font-weight: 600; line-height: 1.05; }
+.dt-nav__menu {
+  display: flex; gap: 28px; font-size: 13px;
+  margin-left: 8px; letter-spacing: 0.04em;
+}
+.dt-nav__menu a { color: #fff; text-decoration: none; }
+.dt-nav__menu a:hover { color: var(--aqua); }
+.dt-nav__cta { margin-left: auto; display: flex; gap: 8px; }
+
+/* ---------- Hero ---------- */
+.dt-hero {
+  background: #000; color: #fff;
+  padding: 96px 0 112px;
+}
+.dt-hero__headline {
+  font-size: 56px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.08;
+  max-width: 820px;
+}
+.dt-hero__lead {
+  margin-top: 22px;
+  color: #CFCFCF;
+  font-size: 16px;
+  line-height: 1.55;
+  max-width: 420px;
+}
+.dt-hero__cta { display: flex; gap: 12px; margin-top: 32px; }
+
+/* ---------- Trusted-by ---------- */
+.dt-trusted { background: #fff; padding: 40px 0 56px; border-bottom: 1px solid var(--ink-8); }
+.dt-trusted__label {
+  font-size: 13px; color: #6B6B6B; max-width: 220px; line-height: 1.4;
+  margin-bottom: 24px;
+}
+.dt-trusted__row {
+  display: flex; align-items: center; gap: 32px; flex-wrap: wrap; justify-content: center;
+}
+.dt-trusted__chip {
+  background: #0A0A0A; color: #fff; border-radius: 10px;
+  padding: 14px 18px;
+  display: flex; align-items: center; gap: 8px;
+  min-height: 60px;
+  font-size: 14px; font-weight: 600; letter-spacing: -0.01em;
+}
+.dt-trusted__chip i { display: block; font-style: normal; font-weight: 400; font-size: 10px; color: #8A8A8A; line-height: 1.2; }
+.dt-trusted__chip b { font-weight: 600; }
+.dt-trusted__chip--wide { padding: 14px 22px; font-size: 12px; letter-spacing: 0.05em; }
+.dt-trusted__chip--light { background: #fff; color: #0A0A0A; border: 1px solid #E6E6E6; }
+.dt-trusted__chip--light i { color: #9A9A9A; }
+.dt-trusted__serif { font-family: var(--font-serif); font-style: italic; font-size: 24px; color: #0A0A0A; }
+
+/* ---------- Sections ---------- */
+.dt-section { padding: 96px 0; background: #fff; }
+.dt-section--dark { background: #000; color: #fff; }
+.dt-section__heading { font-size: 44px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 40px; }
+.dt-section__heading--onDark { color: #fff; }
+
+/* ---------- Service cards ---------- */
+.dt-services { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.dt-service-card {
+  background: #fff; border: 1px solid var(--ink-7); border-radius: var(--r-lg);
+  padding: 32px;
+  transition: all var(--dur-base) var(--ease-out);
+}
+.dt-service-card:hover { border-color: var(--ink-6); transform: translateY(-2px); box-shadow: var(--shadow-2); }
+.dt-service-card__icon { color: #0A0A0A; width: 28px; height: 28px; display: block; margin-bottom: 20px; stroke-width: 1.75; }
+.dt-service-card h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 10px; }
+.dt-service-card p { color: var(--ink-3); font-size: 14px; line-height: 1.55; margin-bottom: 18px; }
+.dt-service-card ul { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 8px; }
+.dt-service-card ul li { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-3); }
+.dt-service-card ul li svg { width: 16px; height: 16px; color: var(--ink-4); stroke-width: 1.75; flex-shrink: 0; }
+
+.dt-link { font-size: 13px; color: #0A0A0A; text-decoration: none; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; border-bottom: 1px solid transparent; padding-bottom: 2px; transition: all var(--dur-fast); }
+.dt-link:hover { border-bottom-color: #0A0A0A; }
+
+/* ---------- Testimonials ---------- */
+.dt-testimonial { max-width: 780px; }
+.dt-testimonial__stars { color: #fff; font-size: 16px; letter-spacing: 4px; margin-bottom: 20px; }
+.dt-testimonial__quote {
+  font-size: 26px; line-height: 1.4; letter-spacing: -0.01em; color: #fff;
+  font-weight: 400; margin: 0 0 24px; font-family: var(--font-sans);
+}
+.dt-testimonial__person { display: flex; align-items: center; gap: 12px; }
+.dt-avatar { width: 40px; height: 40px; border-radius: 999px; background: #fff; color: #0A0A0A; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+.dt-testimonial__dots { display: flex; gap: 8px; margin-top: 28px; }
+.dt-dot { width: 8px; height: 8px; padding: 0; border: 0; border-radius: 999px; background: #3A3A3A; cursor: pointer; transition: background var(--dur-fast); }
+.dt-dot.is-active { background: var(--aqua); }
+
+/* ---------- Footer ---------- */
+.dt-footer { background: #0A0A0A; color: #fff; padding: 72px 0 28px; }
+.dt-footer__grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
+.dt-footer__logo { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; line-height: 1.05; color: #fff; }
+.dt-footer__h { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; color: #8A8A8A; margin-bottom: 16px; }
+.dt-footer a { display: block; color: #CFCFCF; font-size: 14px; text-decoration: none; padding: 4px 0; }
+.dt-footer a:hover { color: #fff; }
+.dt-footer__bottom { max-width: 1200px; margin: 48px auto 0; padding: 20px 24px 0; border-top: 1px solid #1F1F1F; display: flex; justify-content: space-between; font-size: 12px; color: #8A8A8A; }
+
+/* ---------- Modal ---------- */
+.dt-modal { position: fixed; inset: 0; background: rgba(10,10,10,0.58); z-index: 100; display: flex; align-items: center; justify-content: center; }
+.dt-modal__card { background: #fff; color: #0A0A0A; border-radius: var(--r-lg); padding: 32px; max-width: 480px; width: calc(100% - 40px); box-shadow: var(--shadow-3); }
+
+/* ---------- Section heading variant ---------- */
+.dt-hero .dt-highlight, .dt-section--dark .dt-highlight { color: #0A0A0A; }

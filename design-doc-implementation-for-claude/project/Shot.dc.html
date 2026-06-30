@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<div style="position:relative;width:100%;height:100%;background:#fff;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;font-family:var(--font-sans)">
+  <!-- nav -->
+  <div style="height:38px;flex:none;background:#0A0A0A;display:flex;align-items:center;gap:8px;padding:0 14px">
+    <div style="width:14px;height:14px;border-radius:3px;background:#fff"></div>
+    <div style="width:40px;height:6px;border-radius:3px;background:rgba(255,255,255,.55)"></div>
+    <div style="margin-left:auto;display:flex;gap:10px">
+      <div style="width:34px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)"></div>
+      <div style="width:34px;height:6px;border-radius:3px;background:rgba(255,255,255,.3)"></div>
+      <div style="width:50px;height:14px;border-radius:999px;background:var(--aqua)"></div>
+    </div>
+  </div>
+  <!-- hero -->
+  <div style="position:relative;flex:none;height:46%;display:flex;gap:18px;padding:22px 18px;background:#F4F4F4">
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:9px">
+      <div style="width:82%;height:13px;border-radius:4px;background:#1A1A1A"></div>
+      <div style="width:64%;height:13px;border-radius:4px;background:#1A1A1A"></div>
+      <div style="width:90%;height:7px;border-radius:3px;background:#B8B8B8;margin-top:5px"></div>
+      <div style="width:74%;height:7px;border-radius:3px;background:#B8B8B8"></div>
+      <sc-if value="{{ showCta }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:8px;width:96px;height:28px;border-radius:999px;background:#0A0A0A"></div>
+      </sc-if>
+    </div>
+    <div style="width:42%;border-radius:8px;background:repeating-linear-gradient(45deg,#E2E2E2,#E2E2E2 7px,#EDEDED 7px,#EDEDED 14px)"></div>
+    <sc-if value="{{ hl }}" hint-placeholder-val="">
+      <div style="position:absolute;left:14px;bottom:18px;width:118px;height:40px;border:2px solid #FF1F8E;background:rgba(255,31,142,.22);border-radius:6px"></div>
+    </sc-if>
+  </div>
+  <!-- cards -->
+  <div style="flex:1;display:flex;gap:12px;padding:16px 18px;background:#fff">
+    <div style="flex:1;border:1px solid #E6E6E6;border-radius:8px;padding:11px;display:flex;flex-direction:column;gap:7px"><div style="height:34px;border-radius:5px;background:repeating-linear-gradient(45deg,#EDEDED,#EDEDED 6px,#F5F5F5 6px,#F5F5F5 12px)"></div><div style="width:70%;height:7px;border-radius:3px;background:#CFCFCF"></div><div style="width:90%;height:5px;border-radius:3px;background:#E2E2E2"></div></div>
+    <div style="flex:1;border:1px solid #E6E6E6;border-radius:8px;padding:11px;display:flex;flex-direction:column;gap:7px"><div style="height:34px;border-radius:5px;background:repeating-linear-gradient(45deg,#EDEDED,#EDEDED 6px,#F5F5F5 6px,#F5F5F5 12px)"></div><div style="width:70%;height:7px;border-radius:3px;background:#CFCFCF"></div><div style="width:90%;height:5px;border-radius:3px;background:#E2E2E2"></div></div>
+    <div style="flex:1;border:1px solid #E6E6E6;border-radius:8px;padding:11px;display:flex;flex-direction:column;gap:7px"><div style="height:34px;border-radius:5px;background:repeating-linear-gradient(45deg,#EDEDED,#EDEDED 6px,#F5F5F5 6px,#F5F5F5 12px)"></div><div style="width:70%;height:7px;border-radius:3px;background:#CFCFCF"></div><div style="width:90%;height:5px;border-radius:3px;background:#E2E2E2"></div></div>
+  </div>
+  <!-- footer -->
+  <div style="height:30px;flex:none;background:#0A0A0A;display:flex;align-items:center;gap:8px;padding:0 14px"><div style="width:30px;height:5px;border-radius:3px;background:rgba(255,255,255,.4)"></div><div style="width:50px;height:5px;border-radius:3px;background:rgba(255,255,255,.25)"></div></div>
+  <sc-if value="{{ label }}" hint-placeholder-val="">
+    <div style="position:absolute;top:7px;left:7px;font-size:10px;font-weight:600;letter-spacing:.04em;color:#fff;background:rgba(10,10,10,.7);padding:2px 8px;border-radius:999px;text-transform:uppercase">{{ label }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:360,&quot;height&quot;:460},&quot;label&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Before&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showCta&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;hl&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;}}"></script>
+</body>
+</html>

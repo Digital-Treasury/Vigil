@@ -1,0 +1,17 @@
+/* =========================================================================
+   Digital Treasury — Design System entry point
+   Link THIS one file to pull in the whole system:
+     <link rel="stylesheet" href="styles.css">
+
+   It bundles, in order:
+     1. colors_and_type.css      — design tokens, fonts, base type classes
+     2. marketing_site/styles.css — marketing-site component classes (.dt-*)
+     3. client_dashboard/styles.css — dashboard component classes (.dd-*)
+
+   Component classes are namespaced (.dt-* / .dd-*) so importing all three is
+   collision-free. If you only need tokens, link colors_and_type.css alone.
+   ========================================================================= */
+
+@import url('colors_and_type.css');
+@import url('ui_kits/marketing_site/styles.css');
+@import url('ui_kits/client_dashboard/styles.css');
