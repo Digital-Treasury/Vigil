@@ -3,6 +3,7 @@ import { prisma } from '@vigil/db';
 import { effectiveRetentionDays, type MaintenanceJobData } from '@vigil/core';
 import { env } from '../env.js';
 import { storage } from '../storageClient.js';
+import { runDbBackup } from '../backup.js';
 
 const DAY_MS = 86_400_000;
 
@@ -94,9 +95,9 @@ export async function maintenanceProcessor(job: Job<MaintenanceJobData>) {
       return result;
     }
     case 'db-backup': {
-      // Implemented in P9 (nightly pg_dump).
-      console.log('[maintenance] db-backup not yet implemented');
-      return { skipped: true };
+      const result = await runDbBackup();
+      console.log(`[maintenance] db backup → ${result.key} (${Math.round(result.bytes / 1024)} KB)`);
+      return result;
     }
     default:
       return { skipped: true };

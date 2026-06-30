@@ -2,6 +2,10 @@
 # OS dependencies are present (Lighthouse uses the same Chromium). The base
 # version MUST match the `playwright` npm version in apps/worker/package.json.
 FROM mcr.microsoft.com/playwright:v1.49.1-noble
+# postgresql-client provides pg_dump for the nightly DB backup job.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends postgresql-client \
+  && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 WORKDIR /repo
 

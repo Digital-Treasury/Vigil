@@ -37,12 +37,19 @@ export async function reconcileSchedules(): Promise<void> {
   console.log(`[scheduler] reconciled ${wanted.size} client schedule(s)`);
 }
 
-/** Register the recurring maintenance jobs (retention prune; backup in P9). */
+/** Register the recurring maintenance jobs: retention prune + nightly DB backup. */
 export async function ensureMaintenanceSchedules(): Promise<void> {
   await maintenanceQueue.upsertJobScheduler(
     'maintenance:prune-retention',
     { pattern: env.pruneCron, tz: env.defaultTimezoneForJobs },
     { name: 'prune-retention', data: { task: 'prune-retention' } },
   );
-  console.log(`[scheduler] maintenance prune scheduled (${env.pruneCron} ${env.defaultTimezoneForJobs})`);
+  await maintenanceQueue.upsertJobScheduler(
+    'maintenance:db-backup',
+    { pattern: env.backupCron, tz: env.defaultTimezoneForJobs },
+    { name: 'db-backup', data: { task: 'db-backup' } },
+  );
+  console.log(
+    `[scheduler] maintenance scheduled — prune (${env.pruneCron}), backup (${env.backupCron}) ${env.defaultTimezoneForJobs}`,
+  );
 }

@@ -62,6 +62,25 @@ cp .env.example .env   # set APP_DOMAIN, AUTH_*, ENCRYPTION_KEY, RESEND_API_KEY,
 docker compose up -d   # app + worker + postgres + redis + caddy (auto-HTTPS)
 ```
 
+## Backups & restore
+
+The worker runs two nightly maintenance jobs (Melbourne time, BullMQ schedulers):
+
+- **Retention prune** (`PRUNE_CRON`, default `0 3 * * *`) — deletes captures, comparisons and
+  their stored images older than `min(client override, global cap)` days. Baselines keep their own
+  copies and are never pruned; the active checkpoint's "before" captures are preserved.
+- **Database backup** (`BACKUP_CRON`, default `30 3 * * *`) — `pg_dump | gzip` written through the
+  storage driver to `backups/vigil-<Day>.sql.gz`, keyed by weekday for a rolling 7-day window.
+
+Restore from a backup:
+
+```bash
+# LocalDriver: backups live under the storage volume at backups/vigil-<Day>.sql.gz
+gunzip -c backups/vigil-Mon.sql.gz | psql "$DATABASE_URL"
+```
+
+The worker image installs `postgresql-client` so `pg_dump` is available in the container.
+
 ## Prerequisites
 
 - **Google OAuth** client (Workspace "Internal" app) — id, secret, redirect URI.
