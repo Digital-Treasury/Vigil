@@ -57,6 +57,7 @@ export default async function ClientDetailPage({
     include: {
       pages: { orderBy: { createdAt: 'asc' }, include: { viewports: true, baselines: true } },
       runs: { orderBy: { createdAt: 'desc' }, take: 20 },
+      activeCheckpoint: true,
     },
   });
   if (!client) notFound();
@@ -96,7 +97,11 @@ export default async function ClientDetailPage({
         <div className="mt-[18px] flex items-center gap-3 rounded-[11px] border border-[rgba(180,122,18,.3)] bg-[rgba(180,122,18,.1)] px-[18px] py-3">
           <Flag size={18} style={{ color: '#B47A12' }} />
           <span className="flex-1 text-[13.5px] text-[#7A5208]">
-            <strong>Maintenance checkpoint active</strong> — captures will compare against this “before” snapshot.
+            <strong>Maintenance checkpoint active</strong>
+            {client.activeCheckpoint?.startedAt
+              ? ` — started ${client.activeCheckpoint.startedAt.toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' })}.`
+              : '.'}{' '}
+            Captures will compare against this “before” snapshot.
           </span>
         </div>
       )}

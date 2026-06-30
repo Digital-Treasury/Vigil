@@ -44,6 +44,23 @@ export async function enqueueRun(data: RunJobData) {
   });
 }
 
+/** Capture the "before" set for a checkpoint (no run, no baseline promotion). */
+export async function enqueueCheckpointCaptures(
+  checkpointId: string,
+  units: { pageId: string; viewport: 'desktop' | 'mobile' }[],
+) {
+  const q = captureQueue();
+  await Promise.all(
+    units.map((u) =>
+      q.add(
+        'capture',
+        { pageId: u.pageId, viewport: u.viewport, checkpointId } satisfies CaptureJobData,
+        { removeOnComplete: 200, removeOnFail: 300, attempts: 2 },
+      ),
+    ),
+  );
+}
+
 /** Standalone captures (not part of a run) that force-promote to baseline. */
 export async function enqueueRecapture(pageId: string, viewports: ('desktop' | 'mobile')[]) {
   const q = captureQueue();

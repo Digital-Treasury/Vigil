@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@vigil/db';
-import { enqueueRun, removeClientSchedule } from '@/lib/queue';
+import { enqueueRun, removeClientSchedule, enqueueCheckpointCaptures } from '@/lib/queue';
 
 const emailsField = z
   .string()
@@ -75,10 +75,24 @@ export async function deleteClient(id: string) {
 /** Start a maintenance checkpoint (marks the client's checkpoint active).
  *  The "before" capture set is enqueued in P4; here we set up the state. */
 export async function startCheckpoint(clientId: string) {
-  const client = await prisma.client.findUnique({ where: { id: clientId } });
+  const client = await prisma.client.findUnique({
+    where: { id: clientId },
+    include: { pages: { where: { enabled: true }, include: { viewports: true } } },
+  });
   if (!client || client.activeCheckpointId) return;
   const cp = await prisma.checkpoint.create({ data: { clientId, status: 'active' } });
   await prisma.client.update({ where: { id: clientId }, data: { activeCheckpointId: cp.id } });
+
+  // Capture the "before" set across all the client's pages/viewports.
+  const units = client.pages.flatMap((p) => {
+    const vps = (p.viewports.length ? p.viewports.map((v) => v.kind) : ['desktop']) as (
+      | 'desktop'
+      | 'mobile'
+    )[];
+    return vps.map((viewport) => ({ pageId: p.id, viewport }));
+  });
+  if (units.length) await enqueueCheckpointCaptures(cp.id, units);
+
   revalidatePath(`/clients/${clientId}`);
   revalidatePath('/');
 }
