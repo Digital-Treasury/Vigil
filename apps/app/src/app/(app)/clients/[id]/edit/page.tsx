@@ -25,6 +25,9 @@ export default async function EditClientPage({ params }: { params: Promise<{ id:
         lighthouseEnabled: client.lighthouseEnabled,
         thresholdOverride: client.thresholdOverride,
         retentionOverride: client.retentionOverride,
+        scheduleEnabled: client.scheduleEnabled,
+        scheduleCron: client.scheduleCron,
+        timezone: client.timezone,
       }}
     />
   );

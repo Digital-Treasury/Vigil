@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, CalendarClock } from 'lucide-react';
+import { SCHEDULE_PRESETS, describeCron, isValidCron, nextRuns, DEFAULT_TIMEZONE } from '@/lib/schedule';
 
 interface ClientInitial {
   name: string;
@@ -12,6 +13,9 @@ interface ClientInitial {
   lighthouseEnabled: boolean;
   thresholdOverride?: number | null;
   retentionOverride?: number | null;
+  scheduleEnabled?: boolean;
+  scheduleCron?: string | null;
+  timezone?: string | null;
 }
 
 const label = 'mb-2 block text-xs font-semibold text-ink-4';
@@ -32,6 +36,13 @@ export function ClientForm({
   backHref?: string;
 }) {
   const [error, setError] = useState<string | null>(null);
+  const tz = initial?.timezone || DEFAULT_TIMEZONE;
+  const [schedEnabled, setSchedEnabled] = useState(initial?.scheduleEnabled ?? false);
+  const [cron, setCron] = useState(initial?.scheduleCron || '0 2 * * 1');
+
+  const cronValid = isValidCron(cron);
+  const cronDesc = cronValid ? describeCron(cron) : null;
+  const upcoming = schedEnabled && cronValid ? nextRuns(cron, tz, 3) : [];
 
   async function onSubmit(formData: FormData) {
     setError(null);
@@ -83,6 +94,70 @@ export function ClientForm({
           <input type="checkbox" name="lighthouseEnabled" defaultChecked={initial?.lighthouseEnabled ?? true} className="h-4 w-4 accent-ink-1" />
           <span className="text-sm font-medium text-ink-1">Run Lighthouse on every capture</span>
         </label>
+
+        {/* Schedule builder */}
+        <div className="rounded-[12px] border border-ink-7 bg-ink-10 p-4">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              name="scheduleEnabled"
+              checked={schedEnabled}
+              onChange={(e) => setSchedEnabled(e.target.checked)}
+              className="h-4 w-4 accent-ink-1"
+            />
+            <CalendarClock size={16} className="text-ink-3" />
+            <span className="text-sm font-medium text-ink-1">Run on a schedule</span>
+            <span className="ml-auto text-[12px] text-ink-5">{tz}</span>
+          </label>
+          <input type="hidden" name="timezone" value={tz} />
+          <input type="hidden" name="scheduleCron" value={cron} />
+
+          {schedEnabled && (
+            <div className="mt-3.5 flex flex-col gap-3">
+              <div className="flex flex-wrap gap-1.5">
+                {SCHEDULE_PRESETS.map((p) => {
+                  const on = p.cron === cron;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setCron(p.cron)}
+                      className="rounded-[8px] border px-3 py-1.5 text-[12.5px] font-semibold"
+                      style={{
+                        background: on ? 'var(--color-ink-1)' : 'var(--color-ink-10)',
+                        color: on ? '#fff' : 'var(--color-ink-3)',
+                        borderColor: on ? 'var(--color-ink-1)' : 'var(--color-ink-7)',
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <div>
+                <label className={label}>CRON PATTERN (5-field)</label>
+                <input
+                  value={cron}
+                  onChange={(e) => setCron(e.target.value)}
+                  className={`${input} font-mono ${cronValid ? '' : 'border-danger'}`}
+                  placeholder="0 2 * * 1"
+                />
+              </div>
+              {cronValid ? (
+                <div className="rounded-[9px] border border-ink-8 bg-ink-9 px-3.5 py-2.5">
+                  <div className="text-[12.5px] font-medium text-ink-2">{cronDesc}</div>
+                  {upcoming.length > 0 && (
+                    <div className="mt-1.5 text-[12px] text-ink-5">
+                      Next: {upcoming.map((d) => d.toLocaleString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: tz })).join(' · ')}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-[12.5px] text-danger">Not a valid cron pattern.</div>
+              )}
+            </div>
+          )}
+        </div>
 
         {error && (
           <div className="rounded-[10px] border border-[rgba(192,50,43,.3)] bg-[rgba(192,50,43,.08)] px-3.5 py-2.5 text-[13px] text-danger">

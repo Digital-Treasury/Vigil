@@ -12,4 +12,9 @@ export const env = {
   resendApiKey: process.env.RESEND_API_KEY ?? '',
   notifyFrom: process.env.NOTIFY_FROM ?? 'Vigil <vigil@digitaltreasury.com.au>',
   defaultThresholdPct: Number(process.env.DEFAULT_DIFF_THRESHOLD_PCT ?? '1.0'),
+  defaultRetentionDays: Number(process.env.DEFAULT_RETENTION_DAYS ?? '90'),
+  databaseUrl: process.env.DATABASE_URL ?? '',
+  backupCron: process.env.BACKUP_CRON ?? '30 3 * * *',
+  pruneCron: process.env.PRUNE_CRON ?? '0 3 * * *',
+  defaultTimezoneForJobs: process.env.DEFAULT_TIMEZONE ?? 'Australia/Melbourne',
 } as const;

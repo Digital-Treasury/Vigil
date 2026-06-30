@@ -4,7 +4,13 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma } from '@vigil/db';
-import { enqueueRun, removeClientSchedule, enqueueCheckpointCaptures } from '@/lib/queue';
+import {
+  enqueueRun,
+  removeClientSchedule,
+  upsertClientSchedule,
+  enqueueCheckpointCaptures,
+} from '@/lib/queue';
+import { isValidCron, DEFAULT_TIMEZONE } from '@/lib/schedule';
 
 const emailsField = z
   .string()
@@ -28,6 +34,9 @@ const ClientInput = z.object({
   retentionOverride: z
     .union([z.coerce.number().int().min(1), z.literal('').transform(() => undefined)])
     .optional(),
+  scheduleEnabled: z.coerce.boolean().default(false),
+  scheduleCron: z.string().trim().optional().or(z.literal('').transform(() => undefined)),
+  timezone: z.string().trim().default(DEFAULT_TIMEZONE),
 });
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -41,7 +50,28 @@ function fields(formData: FormData) {
     lighthouseEnabled: formData.get('lighthouseEnabled') === 'on',
     thresholdOverride: formData.get('thresholdOverride') ?? '',
     retentionOverride: formData.get('retentionOverride') ?? '',
+    scheduleEnabled: formData.get('scheduleEnabled') === 'on',
+    scheduleCron: formData.get('scheduleCron') ?? '',
+    timezone: formData.get('timezone') ?? DEFAULT_TIMEZONE,
   };
+}
+
+type ClientData = z.infer<typeof ClientInput>;
+
+/** Validate the schedule and reconcile the BullMQ job scheduler for a client. */
+function validateSchedule(data: ClientData) {
+  if (data.scheduleEnabled) {
+    if (!data.scheduleCron) throw new Error('Enable a schedule means a cron pattern is required.');
+    if (!isValidCron(data.scheduleCron)) throw new Error('That cron pattern is not valid.');
+  }
+}
+
+async function syncSchedule(clientId: string, data: ClientData) {
+  if (data.scheduleEnabled && data.scheduleCron) {
+    await upsertClientSchedule(clientId, data.scheduleCron, data.timezone || DEFAULT_TIMEZONE);
+  } else {
+    await removeClientSchedule(clientId);
+  }
 }
 
 export async function createClient(formData: FormData) {
@@ -49,7 +79,9 @@ export async function createClient(formData: FormData) {
   if (!parsed.success) {
     throw new Error(parsed.error.issues[0]?.message ?? 'Invalid input');
   }
+  validateSchedule(parsed.data);
   const client = await prisma.client.create({ data: parsed.data });
+  await syncSchedule(client.id, parsed.data);
   revalidatePath('/');
   redirect(`/clients/${client.id}`);
 }
@@ -59,7 +91,9 @@ export async function updateClient(id: string, formData: FormData) {
   if (!parsed.success) {
     throw new Error(parsed.error.issues[0]?.message ?? 'Invalid input');
   }
+  validateSchedule(parsed.data);
   await prisma.client.update({ where: { id }, data: parsed.data });
+  await syncSchedule(id, parsed.data);
   revalidatePath(`/clients/${id}`);
   revalidatePath('/');
   redirect(`/clients/${id}`);

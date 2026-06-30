@@ -22,6 +22,7 @@ import { DeleteButton } from '@/components/DeleteButton';
 import { deleteClient } from '@/lib/actions/clients';
 import { deletePage } from '@/lib/actions/pages';
 import { describeCron, deriveHealth, relativeTime } from '@/lib/health';
+import { nextRuns } from '@/lib/schedule';
 
 export const dynamic = 'force-dynamic';
 
@@ -206,17 +207,35 @@ export default async function ClientDetailPage({
       {/* SCHEDULE */}
       {tab === 'schedule' && (
         <div className="mt-[22px] max-w-[560px] rounded-[14px] border border-ink-7 bg-ink-10 p-[26px]">
-          <div className="text-[15px] font-semibold text-ink-1">Scheduled runs</div>
-          <div className="mt-1 text-[13px] text-ink-5">Capture automatically on a cadence.</div>
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="text-[15px] font-semibold text-ink-1">Scheduled runs</div>
+              <div className="mt-1 text-[13px] text-ink-5">Capture automatically on a cadence ({client.timezone}).</div>
+            </div>
+            <Link href={`/clients/${id}/edit`} className="flex h-9 items-center gap-1.5 rounded-[9px] border border-ink-7 bg-ink-10 px-3.5 text-[13px] font-semibold text-ink-1">
+              <Pencil size={14} /> Edit schedule
+            </Link>
+          </div>
           <div className="mt-5 flex items-center gap-2.5 rounded-[10px] bg-ink-9 px-4 py-3.5">
             <CalendarCheck size={16} className="text-ink-4" />
             <span className="text-[13px] text-ink-3">
-              {client.scheduleEnabled
+              {client.scheduleEnabled && client.scheduleCron
                 ? describeCron(client.scheduleCron, client.timezone)
                 : 'No schedule — manual runs only.'}
             </span>
           </div>
-          <p className="mt-4 text-[12.5px] text-ink-5">The schedule builder (timezone {client.timezone}) is configured in client settings.</p>
+          {client.scheduleEnabled && client.scheduleCron && (
+            <div className="mt-3">
+              <div className="dt-eyebrow mb-1.5">Next runs</div>
+              <div className="flex flex-col gap-1">
+                {nextRuns(client.scheduleCron, client.timezone, 4).map((d, i) => (
+                  <span key={i} className="text-[13px] text-ink-3">
+                    {d.toLocaleString('en-AU', { weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: client.timezone })}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 
