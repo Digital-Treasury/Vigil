@@ -25,18 +25,28 @@ import {
   diffColor,
   formatDiffPct,
   LH_CATEGORIES,
+  SEVERITY,
   type ViewportKey,
   type LighthouseData,
+  type RecommendationKey,
 } from '@vigil/core';
+import type { AssessmentView, AssessResult } from '@/lib/actions/assess';
 
 interface CompareBlock {
+  comparisonId: string;
   pct: number | null;
   beforeUrl: string | null;
   afterUrl: string | null;
   diffUrl: string | null;
   htmlDiff: string;
   domDiff: string;
+  assessment: AssessmentView | null;
 }
+
+const RECOMMENDATION: Record<RecommendationKey, { label: string; color: string; bg: string }> = {
+  accept_new_baseline: { label: 'Accept new baseline', color: '#0F6B45', bg: 'rgba(26,143,95,.10)' },
+  keep_and_investigate: { label: 'Keep & investigate', color: '#992822', bg: 'rgba(192,50,43,.10)' },
+};
 export interface DiffReviewData {
   runId: string;
   pageId: string;
@@ -60,11 +70,13 @@ export function DiffReview({
   onAccept,
   onFlag,
   onAddMask,
+  onAssess,
 }: {
   data: DiffReviewData;
   onAccept: () => Promise<void>;
   onFlag: (note?: string) => Promise<void>;
   onAddMask: (selector: string, runId?: string) => Promise<void>;
+  onAssess: (comparisonId: string) => Promise<AssessResult>;
 }) {
   const router = useRouter();
   const hasCheckpoint = !!data.checkpoint;
@@ -73,6 +85,15 @@ export function DiffReview({
     data.isMaintenance && hasCheckpoint ? 'checkpoint' : 'baseline',
   );
   const active = (compare === 'checkpoint' ? data.checkpoint : data.baseline) ?? data.baseline ?? data.checkpoint;
+
+  // assessments keyed by comparison id (seeded from server, updated on Ask Claude)
+  const [assessments, setAssessments] = useState<Record<string, AssessmentView>>(() => {
+    const seed: Record<string, AssessmentView> = {};
+    if (data.baseline?.assessment) seed[data.baseline.comparisonId] = data.baseline.assessment;
+    if (data.checkpoint?.assessment) seed[data.checkpoint.comparisonId] = data.checkpoint.assessment;
+    return seed;
+  });
+  const activeAssessment = active ? assessments[active.comparisonId] ?? null : null;
 
   const [mode, setMode] = useState<Mode>('side');
   const [highlight, setHighlight] = useState(true);
@@ -217,13 +238,12 @@ export function DiffReview({
         {/* right rail: lighthouse (P5) + claude (P6) placeholders */}
         <div className="flex flex-col gap-4">
           <LighthousePanel current={data.lighthouse.current} baseline={data.lighthouse.baseline} />
-          <div className="rounded-[14px] border border-ink-7 bg-ink-10 px-5 py-[18px]">
-            <div className="mb-1 flex items-center gap-2"><Sparkles size={16} className="text-ink-2" /><span className="text-sm font-semibold text-ink-1">Claude assessment</span></div>
-            <p className="my-2 text-[12.5px] leading-relaxed text-ink-5">Ask Claude for a severity read and recommendation. Manual — it uses the Anthropic API.</p>
-            <button disabled className="flex h-[42px] w-full items-center justify-center gap-2 rounded-[10px] border border-ink-2 bg-ink-1 text-[13.5px] font-semibold text-white opacity-50">
-              <Sparkles size={16} /> Ask Claude
-            </button>
-          </div>
+          <ClaudePanel
+            comparisonId={active?.comparisonId}
+            assessment={activeAssessment}
+            onAssess={onAssess}
+            onResult={(id, a) => setAssessments((prev) => ({ ...prev, [id]: a }))}
+          />
         </div>
       </div>
 
@@ -232,6 +252,21 @@ export function DiffReview({
         <button onClick={() => setModal('mask')} className="flex h-[42px] items-center gap-1.5 rounded-[10px] border border-ink-7 bg-ink-10 px-[15px] text-[13.5px] font-semibold text-ink-3">
           <EyeOff size={16} /> Add region to ignore mask
         </button>
+        {activeAssessment && (
+          <div className="flex items-center gap-2 rounded-[10px] border border-ink-7 bg-ink-9 px-3 py-1.5">
+            <Sparkles size={14} className="text-ink-4" />
+            <span className="text-[12px] text-ink-5">Claude:</span>
+            <span
+              className="rounded-full px-2 py-0.5 text-[12px] font-semibold"
+              style={{
+                color: RECOMMENDATION[activeAssessment.recommendation].color,
+                background: RECOMMENDATION[activeAssessment.recommendation].bg,
+              }}
+            >
+              {RECOMMENDATION[activeAssessment.recommendation].label}
+            </span>
+          </div>
+        )}
         <div className="ml-auto flex items-center gap-2.5">
           <button onClick={() => setModal('flag')} className="flex h-11 items-center gap-2 rounded-[11px] border border-ink-2 bg-ink-10 px-[18px] text-sm font-semibold text-ink-1">
             <Flag size={16} /> Keep old &amp; flag <kbd className="ml-0.5 rounded border border-ink-6 bg-ink-8 px-1.5 font-mono text-[11px]">K</kbd>
@@ -381,6 +416,114 @@ function LighthousePanel({ current, baseline }: { current: LighthouseData | null
             );
           })}
         </div>
+      )}
+    </div>
+  );
+}
+
+function ClaudePanel({
+  comparisonId,
+  assessment,
+  onAssess,
+  onResult,
+}: {
+  comparisonId?: string;
+  assessment: AssessmentView | null;
+  onAssess: (comparisonId: string) => Promise<AssessResult>;
+  onResult: (comparisonId: string, a: AssessmentView) => void;
+}) {
+  const [pending, start] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+
+  const run = () => {
+    if (!comparisonId) return;
+    setError(null);
+    start(async () => {
+      const r = await onAssess(comparisonId);
+      if (r.ok) onResult(comparisonId, r.assessment);
+      else setError(r.error);
+    });
+  };
+
+  return (
+    <div className="rounded-[14px] border border-ink-7 bg-ink-10 px-5 py-[18px]">
+      <div className="mb-2 flex items-center gap-2">
+        <Sparkles size={16} className="text-ink-2" />
+        <span className="text-sm font-semibold text-ink-1">Claude assessment</span>
+        {assessment && (
+          <span className="ml-auto text-[11px] text-ink-5">{assessment.model}</span>
+        )}
+      </div>
+
+      {assessment ? (
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="rounded-full px-2.5 py-0.5 text-[12px] font-semibold"
+              style={{ color: SEVERITY[assessment.severity].color, background: SEVERITY[assessment.severity].bg }}
+            >
+              {SEVERITY[assessment.severity].label}
+            </span>
+            <span className="text-[12px] text-ink-5">{Math.round(assessment.confidence * 100)}% confidence</span>
+          </div>
+
+          <p className="text-[13px] font-medium leading-relaxed text-ink-2">{assessment.summary}</p>
+          {assessment.details && (
+            <p className="text-[12.5px] leading-relaxed text-ink-4">{assessment.details}</p>
+          )}
+
+          {assessment.affectedAreas.length > 0 && (
+            <div>
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-5">Affected areas</div>
+              <div className="flex flex-wrap gap-1.5">
+                {assessment.affectedAreas.map((a, i) => (
+                  <span key={i} className="rounded-md border border-ink-7 bg-ink-9 px-2 py-0.5 text-[12px] text-ink-3">{a}</span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-[10px] border border-ink-7 bg-ink-9 px-3 py-2.5">
+            <div className="mb-1 flex items-center gap-2">
+              <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-5">Recommendation</span>
+              <span
+                className="rounded-full px-2 py-0.5 text-[12px] font-semibold"
+                style={{ color: RECOMMENDATION[assessment.recommendation].color, background: RECOMMENDATION[assessment.recommendation].bg }}
+              >
+                {RECOMMENDATION[assessment.recommendation].label}
+              </span>
+            </div>
+            {assessment.recommendationReason && (
+              <p className="text-[12.5px] leading-relaxed text-ink-4">{assessment.recommendationReason}</p>
+            )}
+          </div>
+
+          <p className="text-[11px] italic text-ink-5">A read, not a verdict — you decide.</p>
+
+          {error && <p className="text-[12.5px] text-danger">{error}</p>}
+          <button
+            onClick={run}
+            disabled={pending || !comparisonId}
+            className="flex h-9 w-full items-center justify-center gap-2 rounded-[10px] border border-ink-7 bg-ink-10 text-[13px] font-semibold text-ink-2 disabled:opacity-50"
+          >
+            {pending ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />} Re-run assessment
+          </button>
+        </div>
+      ) : (
+        <>
+          <p className="my-2 text-[12.5px] leading-relaxed text-ink-5">
+            Ask Claude for a severity read and recommendation. Manual — it uses the Anthropic API (~$0.03–0.05).
+          </p>
+          {error && <p className="mb-2 text-[12.5px] text-danger">{error}</p>}
+          <button
+            onClick={run}
+            disabled={pending || !comparisonId}
+            className="flex h-[42px] w-full items-center justify-center gap-2 rounded-[10px] bg-ink-1 text-[13.5px] font-semibold text-white disabled:opacity-50"
+          >
+            {pending ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+            {pending ? 'Assessing…' : 'Ask Claude'}
+          </button>
+        </>
       )}
     </div>
   );

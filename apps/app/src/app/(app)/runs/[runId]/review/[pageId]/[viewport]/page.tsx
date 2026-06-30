@@ -1,13 +1,29 @@
 import { notFound } from 'next/navigation';
-import { prisma, type ViewportKind } from '@vigil/db';
+import { prisma, type ViewportKind, type Assessment } from '@vigil/db';
 import { getStorage } from '@vigil/storage';
 import { asLighthouse } from '@vigil/core';
 import { DiffReview } from '@/components/DiffReview';
 import { acceptBaseline, keepAndFlag, addMask } from '@/lib/actions/review';
+import { assessComparison, type AssessmentView } from '@/lib/actions/assess';
 
 export const dynamic = 'force-dynamic';
 
 const blob = (key?: string | null) => (key ? `/api/blob?key=${encodeURIComponent(key)}` : null);
+
+function toAssessmentView(a: Assessment | undefined): AssessmentView | null {
+  if (!a) return null;
+  return {
+    model: a.model,
+    severity: a.severity,
+    confidence: a.confidence,
+    summary: a.summary,
+    details: a.details,
+    affectedAreas: a.affectedAreas,
+    recommendation: a.recommendation,
+    recommendationReason: a.recommendationReason,
+    createdAt: a.createdAt.toISOString(),
+  };
+}
 
 async function readDiff(key?: string | null): Promise<string> {
   if (!key) return '';
@@ -50,25 +66,34 @@ export default async function DiffReviewPage({
       })
     : null;
 
+  const assessments = await prisma.assessment.findMany({
+    where: { comparisonId: { in: comparisons.map((c) => c.id) } },
+  });
+  const assessmentByComp = new Map(assessments.map((a) => [a.comparisonId, a]));
+
   const baselineBlock = baselineComp
     ? {
+        comparisonId: baselineComp.id,
         pct: baselineComp.changedPixelPct,
         beforeUrl: blob(baseline?.screenshotKey),
         afterUrl: blob(capture.screenshotKey),
         diffUrl: blob(baselineComp.diffImageKey),
         htmlDiff: await readDiff(baselineComp.sourceHtmlDiffKey),
         domDiff: await readDiff(baselineComp.domDiffKey),
+        assessment: toAssessmentView(assessmentByComp.get(baselineComp.id)),
       }
     : null;
 
   const checkpointBlock = checkpointComp
     ? {
+        comparisonId: checkpointComp.id,
         pct: checkpointComp.changedPixelPct,
         beforeUrl: blob(checkpointCapture?.screenshotKey),
         afterUrl: blob(capture.screenshotKey),
         diffUrl: blob(checkpointComp.diffImageKey),
         htmlDiff: await readDiff(checkpointComp.sourceHtmlDiffKey),
         domDiff: await readDiff(checkpointComp.domDiffKey),
+        assessment: toAssessmentView(assessmentByComp.get(checkpointComp.id)),
       }
     : null;
 
@@ -125,6 +150,7 @@ export default async function DiffReviewPage({
       onAccept={acceptBaseline.bind(null, runId, pageId, viewport)}
       onFlag={keepAndFlag.bind(null, runId, pageId, viewport)}
       onAddMask={addMask.bind(null, pageId)}
+      onAssess={assessComparison}
     />
   );
 }
