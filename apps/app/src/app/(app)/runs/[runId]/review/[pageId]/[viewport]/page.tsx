@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { prisma, type ViewportKind } from '@vigil/db';
 import { getStorage } from '@vigil/storage';
+import { asLighthouse } from '@vigil/core';
 import { DiffReview } from '@/components/DiffReview';
 import { acceptBaseline, keepAndFlag, addMask } from '@/lib/actions/review';
 
@@ -116,6 +117,10 @@ export default async function DiffReviewPage({
         checkpoint: checkpointBlock,
         threeUp,
         nextHref,
+        lighthouse: {
+          current: asLighthouse(capture.lighthouseJson),
+          baseline: asLighthouse(baseline?.lighthouseJson),
+        },
       }}
       onAccept={acceptBaseline.bind(null, runId, pageId, viewport)}
       onFlag={keepAndFlag.bind(null, runId, pageId, viewport)}

@@ -14,9 +14,20 @@ import {
   Sparkles,
   X,
   ArrowRight,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  Gauge,
   Loader2,
 } from 'lucide-react';
-import { VIEWPORTS, diffColor, formatDiffPct, type ViewportKey } from '@vigil/core';
+import {
+  VIEWPORTS,
+  diffColor,
+  formatDiffPct,
+  LH_CATEGORIES,
+  type ViewportKey,
+  type LighthouseData,
+} from '@vigil/core';
 
 interface CompareBlock {
   pct: number | null;
@@ -39,6 +50,7 @@ export interface DiffReviewData {
   checkpoint: CompareBlock | null;
   threeUp: { baselineUrl: string; checkpointUrl: string; captureUrl: string } | null;
   nextHref: string | null;
+  lighthouse: { current: LighthouseData | null; baseline: LighthouseData | null };
 }
 
 type Mode = 'side' | 'overlay' | 'swipe' | '3up';
@@ -204,10 +216,7 @@ export function DiffReview({
 
         {/* right rail: lighthouse (P5) + claude (P6) placeholders */}
         <div className="flex flex-col gap-4">
-          <div className="rounded-[14px] border border-ink-7 bg-ink-10 px-5 py-[18px]">
-            <div className="mb-2 text-sm font-semibold text-ink-1">Lighthouse</div>
-            <p className="text-[12.5px] leading-relaxed text-ink-5">Baseline-vs-current deltas appear here when Lighthouse is enabled for the client.</p>
-          </div>
+          <LighthousePanel current={data.lighthouse.current} baseline={data.lighthouse.baseline} />
           <div className="rounded-[14px] border border-ink-7 bg-ink-10 px-5 py-[18px]">
             <div className="mb-1 flex items-center gap-2"><Sparkles size={16} className="text-ink-2" /><span className="text-sm font-semibold text-ink-1">Claude assessment</span></div>
             <p className="my-2 text-[12.5px] leading-relaxed text-ink-5">Ask Claude for a severity read and recommendation. Manual — it uses the Anthropic API.</p>
@@ -334,6 +343,45 @@ function CodeDiff({ text }: { text: string }) {
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function LighthousePanel({ current, baseline }: { current: LighthouseData | null; baseline: LighthouseData | null }) {
+  return (
+    <div className="rounded-[14px] border border-ink-7 bg-ink-10 px-5 py-[18px]">
+      <div className="mb-3.5 flex items-center gap-2">
+        <Gauge size={16} className="text-ink-3" />
+        <span className="text-sm font-semibold text-ink-1">Lighthouse</span>
+        <span className="ml-auto text-[12px] text-ink-5">baseline → current</span>
+      </div>
+      {!current ? (
+        <p className="text-[12.5px] leading-relaxed text-ink-5">
+          No Lighthouse result for this capture yet (it may still be running, or is disabled for this client).
+        </p>
+      ) : (
+        <div className="flex flex-col gap-2.5">
+          {LH_CATEGORIES.map(({ key, label }) => {
+            const cur = current.scores[key];
+            const base = baseline?.scores[key];
+            const delta = base !== undefined ? cur - base : undefined;
+            const Arrow = delta === undefined || delta === 0 ? Minus : delta > 0 ? ArrowUp : ArrowDown;
+            const color = delta === undefined || delta === 0 ? 'var(--color-ink-5)' : delta > 0 ? '#1A8F5F' : '#C0322B';
+            return (
+              <div key={key} className="flex items-center gap-2.5">
+                <span className="flex-1 text-[13px] text-ink-3">{label}</span>
+                <span className="text-[13px] text-ink-5">{base ?? '—'}</span>
+                <ArrowRight size={12} className="text-ink-6" />
+                <span className="w-6 text-right text-sm font-bold text-ink-1">{cur}</span>
+                <span className="flex w-10 items-center justify-end gap-0.5 text-[12px] font-semibold" style={{ color }}>
+                  <Arrow size={12} />
+                  {delta === undefined ? '—' : delta === 0 ? '0' : delta > 0 ? `+${delta}` : delta}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

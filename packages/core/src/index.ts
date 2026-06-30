@@ -4,3 +4,4 @@ export * from './thresholds';
 export * from './assessment';
 export * from './csv';
 export * from './jobs';
+export * from './lighthouse';
