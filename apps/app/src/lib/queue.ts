@@ -17,8 +17,11 @@ const globalForQueue = globalThis as unknown as {
   vigilQueues?: Record<string, Queue>;
 };
 
+// lazyConnect: don't open a socket until the first enqueue — keeps build/SSR
+// from trying to reach Redis when no job is actually produced.
 export const connection =
-  globalForQueue.vigilRedis ?? new IORedis(env.redisUrl, { maxRetriesPerRequest: null });
+  globalForQueue.vigilRedis ??
+  new IORedis(env.redisUrl, { maxRetriesPerRequest: null, lazyConnect: true });
 if (process.env.NODE_ENV !== 'production') globalForQueue.vigilRedis = connection;
 
 function queue<T>(name: string): Queue<T> {
