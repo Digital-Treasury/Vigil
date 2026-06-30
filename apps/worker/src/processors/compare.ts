@@ -6,6 +6,7 @@ import { env } from '../env.js';
 import { storage, getText, putBuffer, putText } from '../storageClient.js';
 import { visualDiff } from '../diff/visual.js';
 import { unifiedDiff } from '../diff/code.js';
+import { sendRunNotification } from '../email.js';
 
 // Threshold above which a flagged change is treated as a likely break (escalates
 // the page to "broken" in the run summary before any Claude assessment).
@@ -169,13 +170,19 @@ export async function compareProcessor(job: Job<CompareJobData>) {
     }
   }
 
+  const summary = { passed, changes, broken, failed, total: captures.length };
   await prisma.run.update({
     where: { id: runId },
-    data: {
-      status: 'completed',
-      completedAt: new Date(),
-      summary: { passed, changes, broken, failed, total: captures.length },
-    },
+    data: { status: 'completed', completedAt: new Date(), summary },
   });
+
+  await sendRunNotification({
+    runId,
+    clientName: run.client.name,
+    notifyEmails: run.client.notifyEmails,
+    isMaintenance: !!run.checkpointId,
+    summary,
+  });
+
   return { runId, passed, changes, broken, failed };
 }
