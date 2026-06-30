@@ -1,0 +1,6 @@
+# Automatic HTTPS in front of the Next.js app. Set APP_DOMAIN in .env (e.g.
+# vigil.digitaltreasury.com.au). For local, APP_DOMAIN=localhost serves over HTTP.
+{$APP_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy app:3000
+}

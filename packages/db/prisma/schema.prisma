@@ -1,0 +1,361 @@
+// Vigil — data model
+// Source of truth: Product Scope §8. UUID PKs; created_at/updated_at everywhere.
+// Storage keys reference objects in the active storage driver (local path or S3 key).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum ViewportKind {
+  desktop
+  mobile
+}
+
+enum CheckpointStatus {
+  active
+  ended
+}
+
+enum RunTrigger {
+  manual
+  scheduled
+  maintenance
+}
+
+enum RunStatus {
+  queued
+  running
+  completed
+  failed
+}
+
+enum CaptureStatus {
+  captured
+  failed
+}
+
+enum CaptureFailureReason {
+  http_error
+  timeout
+  redirected
+  login_wall
+  navigation_error
+  screenshot_error
+  unknown
+}
+
+enum ComparisonKind {
+  baseline_vs_capture
+  checkpoint_vs_capture
+}
+
+enum ComparisonStatus {
+  pending
+  accepted
+  flagged
+  resolved
+}
+
+enum Severity {
+  intentional_change
+  cosmetic_minor
+  likely_regression
+  broken
+}
+
+enum Recommendation {
+  accept_new_baseline
+  keep_and_investigate
+}
+
+enum InvestigationStatus {
+  open
+  resolved
+}
+
+// ─── Identity ─────────────────────────────────────────────────────────────────
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String?
+  image       String?
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  approvedBaselines    Baseline[]       @relation("BaselineApprovedBy")
+  startedCheckpoints   Checkpoint[]     @relation("CheckpointStartedBy")
+  endedCheckpoints     Checkpoint[]     @relation("CheckpointEndedBy")
+  createdAssessments   Assessment[]     @relation("AssessmentCreatedBy")
+  flaggedInvestigations Investigation[] @relation("InvestigationFlaggedBy")
+  resolvedInvestigations Investigation[] @relation("InvestigationResolvedBy")
+
+  @@map("users")
+}
+
+// ─── Clients & pages ─────────────────────────────────────────────────────────
+
+model Client {
+  id                 String   @id @default(uuid())
+  name               String
+  primaryUrl         String
+  logoUrl            String?
+  scheduleCron       String?
+  scheduleEnabled    Boolean  @default(false)
+  timezone           String   @default("Australia/Melbourne")
+  thresholdOverride  Float?
+  retentionOverride  Int?
+  lighthouseEnabled  Boolean  @default(true)
+  notifyEmails       String[] @default([])
+  activeCheckpointId String?  @unique
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  pages           Page[]
+  runs            Run[]
+  checkpoints     Checkpoint[]    @relation("ClientCheckpoints")
+  activeCheckpoint Checkpoint?    @relation("ClientActiveCheckpoint", fields: [activeCheckpointId], references: [id])
+  investigations  Investigation[]
+
+  @@map("clients")
+}
+
+model Page {
+  id              String       @id @default(uuid())
+  clientId        String
+  label           String
+  url             String
+  maskSelectors   String[]     @default([])
+  waitForSelector String?
+  enabled         Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  client    Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  viewports PageViewport[]
+  baselines Baseline[]
+  captures  Capture[]
+  comparisons Comparison[]
+  investigations Investigation[]
+
+  @@index([clientId])
+  @@map("pages")
+}
+
+model PageViewport {
+  id        String       @id @default(uuid())
+  pageId    String
+  kind      ViewportKind
+  width     Int
+  createdAt DateTime     @default(now())
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@unique([pageId, kind])
+  @@map("page_viewports")
+}
+
+// ─── Baselines & checkpoints ─────────────────────────────────────────────────
+
+model Baseline {
+  id                     String       @id @default(uuid())
+  pageId                 String
+  viewport               ViewportKind
+  screenshotKey          String
+  servedHtmlKey          String?
+  renderedDomKey         String?
+  renderedDomNormalisedKey String?
+  lighthouseJson         Json?
+  approvedById           String?
+  approvedAt             DateTime     @default(now())
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+
+  page       Page  @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  approvedBy User? @relation("BaselineApprovedBy", fields: [approvedById], references: [id])
+
+  @@unique([pageId, viewport])
+  @@map("baselines")
+}
+
+model Checkpoint {
+  id          String           @id @default(uuid())
+  clientId    String
+  label       String?
+  status      CheckpointStatus @default(active)
+  startedById String?
+  startedAt   DateTime         @default(now())
+  endedById   String?
+  endedAt     DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  client     Client    @relation("ClientCheckpoints", fields: [clientId], references: [id], onDelete: Cascade)
+  activeForClient Client? @relation("ClientActiveCheckpoint")
+  startedBy  User?     @relation("CheckpointStartedBy", fields: [startedById], references: [id])
+  endedBy    User?     @relation("CheckpointEndedBy", fields: [endedById], references: [id])
+  captures   Capture[]
+  runs       Run[]
+
+  @@index([clientId])
+  @@map("checkpoints")
+}
+
+// ─── Runs, captures, comparisons ─────────────────────────────────────────────
+
+model Run {
+  id           String     @id @default(uuid())
+  clientId     String
+  trigger      RunTrigger
+  checkpointId String?
+  status       RunStatus  @default(queued)
+  startedAt    DateTime?
+  completedAt  DateTime?
+  // summary counts: { passed, changes, broken, failed, total }
+  summary      Json?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  client      Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  checkpoint  Checkpoint?  @relation(fields: [checkpointId], references: [id])
+  captures    Capture[]
+  comparisons Comparison[]
+
+  @@index([clientId])
+  @@map("runs")
+}
+
+model Capture {
+  id                       String                @id @default(uuid())
+  runId                    String?
+  checkpointId             String?
+  pageId                   String
+  viewport                 ViewportKind
+  status                   CaptureStatus
+  failureReason            CaptureFailureReason?
+  failureDetail            String?
+  screenshotKey            String?
+  servedHtmlKey            String?
+  renderedDomKey           String?
+  renderedDomNormalisedKey String?
+  lighthouseJson           Json?
+  width                    Int?
+  height                   Int?
+  capturedAt               DateTime              @default(now())
+  createdAt                DateTime              @default(now())
+
+  run        Run?        @relation(fields: [runId], references: [id], onDelete: Cascade)
+  checkpoint Checkpoint? @relation(fields: [checkpointId], references: [id], onDelete: Cascade)
+  page       Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  comparisonsFrom Comparison[] @relation("ComparisonFromCapture")
+  comparisonsTo   Comparison[] @relation("ComparisonToCapture")
+
+  @@index([runId])
+  @@index([checkpointId])
+  @@index([pageId])
+  @@map("captures")
+}
+
+model Comparison {
+  id              String           @id @default(uuid())
+  runId           String
+  pageId          String
+  viewport        ViewportKind
+  kind            ComparisonKind
+  // "from" side is a baseline (kind=baseline_vs_capture) or a checkpoint capture
+  fromBaselineId  String?
+  fromCaptureId   String?
+  toCaptureId     String
+  changedPixelPct Float?
+  diffImageKey    String?
+  sourceHtmlDiffKey String?
+  domDiffKey      String?
+  flagged         Boolean          @default(false)
+  status          ComparisonStatus @default(pending)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  run         Run            @relation(fields: [runId], references: [id], onDelete: Cascade)
+  page        Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  fromCapture Capture?       @relation("ComparisonFromCapture", fields: [fromCaptureId], references: [id])
+  toCapture   Capture        @relation("ComparisonToCapture", fields: [toCaptureId], references: [id], onDelete: Cascade)
+  assessment  Assessment?
+  investigation Investigation?
+
+  @@index([runId])
+  @@index([pageId])
+  @@map("comparisons")
+}
+
+model Assessment {
+  id                   String         @id @default(uuid())
+  comparisonId         String         @unique
+  model                String
+  severity             Severity
+  confidence           Float
+  summary              String
+  details              String
+  affectedAreas        String[]       @default([])
+  recommendation       Recommendation
+  recommendationReason String
+  createdById          String?
+  rawResponse          Json?
+  createdAt            DateTime       @default(now())
+
+  comparison Comparison @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
+  createdBy  User?      @relation("AssessmentCreatedBy", fields: [createdById], references: [id])
+
+  @@map("assessments")
+}
+
+model Investigation {
+  id           String              @id @default(uuid())
+  comparisonId String              @unique
+  clientId     String
+  pageId       String
+  viewport     ViewportKind
+  status       InvestigationStatus @default(open)
+  notes        String?
+  flaggedById  String?
+  flaggedAt    DateTime            @default(now())
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  comparison Comparison @relation(fields: [comparisonId], references: [id], onDelete: Cascade)
+  client     Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  page       Page       @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  flaggedBy  User?      @relation("InvestigationFlaggedBy", fields: [flaggedById], references: [id])
+  resolvedBy User?      @relation("InvestigationResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([clientId])
+  @@index([status])
+  @@map("investigations")
+}
+
+// ─── Settings (singleton) ─────────────────────────────────────────────────────
+
+model Settings {
+  id                  String   @id @default(uuid())
+  // Encrypted at rest (AES-GCM); never logged. Set via UI.
+  anthropicApiKeyEnc  String?
+  assessmentModel     String   @default("claude-sonnet-4-6")
+  globalThresholdPct  Float    @default(1.0)
+  globalRetentionDays Int      @default(90)
+  notifyFrom          String?
+  notifyDefaults      Json?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@map("settings")
+}
