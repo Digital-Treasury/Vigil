@@ -24,13 +24,15 @@ export interface CheckpointJobData {
   clientId: string;
 }
 
-/** One screenshot+code capture for a (page × viewport). */
+/** One screenshot+code capture for a (page × viewport). The Capture row is
+ *  created by the processor on completion (with its final status). */
 export interface CaptureJobData {
-  captureId: string;
   pageId: string;
   viewport: ViewportKindStr;
   runId?: string;
   checkpointId?: string;
+  /** Force-promote this capture to the baseline (explicit "re-capture & set baseline"). */
+  promoteBaseline?: boolean;
 }
 
 /** A Lighthouse pass for a capture (own queue, fresh Chrome). */

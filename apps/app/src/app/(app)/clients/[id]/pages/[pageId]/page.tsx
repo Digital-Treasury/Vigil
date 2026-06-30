@@ -4,6 +4,7 @@ import { ChevronLeft, Pencil, EyeOff, Hourglass, BookmarkCheck } from 'lucide-re
 import { prisma } from '@vigil/db';
 import { VIEWPORTS } from '@vigil/core';
 import { DeleteButton } from '@/components/DeleteButton';
+import { RecaptureButton } from '@/components/RecaptureButton';
 import { deletePage } from '@/lib/actions/pages';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,7 @@ export default async function PageDetail({
           <div className="mt-1 text-[13.5px] text-ink-4">{page.url} · {vpLabels}</div>
         </div>
         <div className="flex items-center gap-2.5">
+          <RecaptureButton clientId={id} pageId={pageId} />
           <Link href={`/clients/${id}/pages/${pageId}/edit`} className="flex h-10 items-center gap-1.5 rounded-[10px] border border-ink-7 bg-ink-10 px-[15px] text-[13.5px] font-semibold text-ink-1">
             <Pencil size={15} /> Edit
           </Link>
@@ -65,12 +67,24 @@ export default async function PageDetail({
             </div>
           ) : (
             <div className="flex gap-4">
-              {page.viewports.map((v) => (
-                <div key={v.kind} className={v.kind === 'desktop' ? 'flex-1' : 'w-24'}>
-                  <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink-5">{VIEWPORTS[v.kind].label}</div>
-                  <div className="aspect-[16/11] rounded-[8px] border border-ink-7 bg-[repeating-linear-gradient(45deg,var(--color-ink-8),var(--color-ink-8)_7px,var(--color-ink-9)_7px,var(--color-ink-9)_14px)]" />
-                </div>
-              ))}
+              {page.viewports.map((v) => {
+                const baseline = page.baselines.find((b) => b.viewport === v.kind);
+                return (
+                  <div key={v.kind} className={v.kind === 'desktop' ? 'flex-1' : 'w-24'}>
+                    <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink-5">{VIEWPORTS[v.kind].label}</div>
+                    {baseline?.screenshotKey ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={`/api/blob?key=${encodeURIComponent(baseline.screenshotKey)}`}
+                        alt={`${v.kind} baseline`}
+                        className={`w-full rounded-[8px] border border-ink-7 ${v.kind === 'desktop' ? 'max-h-[420px] object-cover object-top' : ''}`}
+                      />
+                    ) : (
+                      <div className="aspect-[16/11] rounded-[8px] border border-ink-7 bg-[repeating-linear-gradient(45deg,var(--color-ink-8),var(--color-ink-8)_7px,var(--color-ink-9)_7px,var(--color-ink-9)_14px)]" />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

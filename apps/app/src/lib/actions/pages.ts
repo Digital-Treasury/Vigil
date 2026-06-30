@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { prisma, type ViewportKind } from '@vigil/db';
 import { VIEWPORTS, parsePagesCsv, type ViewportKey } from '@vigil/core';
+import { enqueueRecapture } from '@/lib/queue';
 
 const VP_KINDS: ViewportKey[] = ['desktop', 'mobile'];
 
@@ -86,6 +87,18 @@ export async function deletePage(clientId: string, pageId: string) {
   await prisma.page.delete({ where: { id: pageId } });
   revalidatePath(`/clients/${clientId}`);
   redirect(`/clients/${clientId}?tab=pages`);
+}
+
+/** Re-capture the page now and force-promote the result to baseline. */
+export async function recaptureBaseline(clientId: string, pageId: string) {
+  const page = await prisma.page.findUnique({ where: { id: pageId }, include: { viewports: true } });
+  if (!page) return;
+  const vps = (page.viewports.length ? page.viewports.map((v) => v.kind) : ['desktop']) as (
+    | 'desktop'
+    | 'mobile'
+  )[];
+  await enqueueRecapture(pageId, vps);
+  revalidatePath(`/clients/${clientId}/pages/${pageId}`);
 }
 
 /** CSV page import (Scope §4.2): parse, validate, create the valid rows. */

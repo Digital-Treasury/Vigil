@@ -5,8 +5,8 @@ import {
   QUEUES,
   scheduleId,
   type RunJobData,
-  type CheckpointJobData,
   type CompareJobData,
+  type CaptureJobData,
 } from '@vigil/core';
 import { env } from './env';
 
@@ -33,7 +33,7 @@ function queue<T>(name: string): Queue<T> {
 }
 
 export const runQueue = () => queue<RunJobData>(QUEUES.run);
-export const checkpointQueue = () => queue<CheckpointJobData>(QUEUES.capture);
+export const captureQueue = () => queue<CaptureJobData>(QUEUES.capture);
 export const compareQueue = () => queue<CompareJobData>(QUEUES.compare);
 
 export async function enqueueRun(data: RunJobData) {
@@ -42,6 +42,20 @@ export async function enqueueRun(data: RunJobData) {
     removeOnFail: 500,
     attempts: 1,
   });
+}
+
+/** Standalone captures (not part of a run) that force-promote to baseline. */
+export async function enqueueRecapture(pageId: string, viewports: ('desktop' | 'mobile')[]) {
+  const q = captureQueue();
+  await Promise.all(
+    viewports.map((viewport) =>
+      q.add(
+        'capture',
+        { pageId, viewport, promoteBaseline: true } satisfies CaptureJobData,
+        { removeOnComplete: 100, removeOnFail: 200, attempts: 2 },
+      ),
+    ),
+  );
 }
 
 /** Create/update the per-client repeatable schedule (idempotent by schedulerId). */

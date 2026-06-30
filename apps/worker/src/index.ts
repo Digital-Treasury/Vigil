@@ -1,38 +1,29 @@
 import { Worker } from 'bullmq';
 import { QUEUES } from '@vigil/core';
-import { connection } from './redis';
-import { env } from './env';
+import { connection } from './redis.js';
+import { env } from './env.js';
+import { closeBrowser } from './browser.js';
+import { runProcessor } from './processors/run.js';
+import { captureProcessor } from './processors/capture.js';
+import { lighthouseProcessor } from './processors/lighthouse.js';
+import { compareProcessor } from './processors/compare.js';
 
 // Vigil capture worker. Two queues with separate concurrency (screenshots vs
-// Lighthouse) because they have conflicting resource needs. Job processors are
-// implemented incrementally across phases P2–P8; P0 boots the process and the
-// queue topology so the stack runs end-to-end.
-
+// Lighthouse) because they have conflicting resource needs.
 const log = (msg: string, extra?: unknown) =>
   console.log(`[worker] ${msg}`, extra !== undefined ? extra : '');
 
-async function notImplemented(name: string) {
-  log(`processor "${name}" not implemented yet`);
-}
-
 const workers: Worker[] = [
-  new Worker(QUEUES.run, async () => notImplemented('run'), { connection, concurrency: 2 }),
-  new Worker(QUEUES.capture, async () => notImplemented('capture'), {
+  new Worker(QUEUES.run, runProcessor, { connection, concurrency: 2 }),
+  new Worker(QUEUES.capture, captureProcessor, {
     connection,
     concurrency: env.screenshotConcurrency,
   }),
-  new Worker(QUEUES.lighthouse, async () => notImplemented('lighthouse'), {
+  new Worker(QUEUES.lighthouse, lighthouseProcessor, {
     connection,
     concurrency: env.lighthouseConcurrency,
   }),
-  new Worker(QUEUES.compare, async () => notImplemented('compare'), {
-    connection,
-    concurrency: 2,
-  }),
-  new Worker(QUEUES.maintenance, async () => notImplemented('maintenance'), {
-    connection,
-    concurrency: 1,
-  }),
+  new Worker(QUEUES.compare, compareProcessor, { connection, concurrency: 2 }),
 ];
 
 for (const w of workers) {
@@ -44,6 +35,7 @@ log(`ready — screenshots×${env.screenshotConcurrency}, lighthouse×${env.ligh
 async function shutdown() {
   log('shutting down…');
   await Promise.allSettled(workers.map((w) => w.close()));
+  await closeBrowser();
   await connection.quit();
   process.exit(0);
 }
