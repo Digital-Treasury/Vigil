@@ -2,6 +2,10 @@ import { getStorage } from '@vigil/storage';
 
 export const storage = getStorage();
 
+export async function getText(key: string): Promise<string> {
+  return (await storage.get(key)).toString('utf8');
+}
+
 export async function putBuffer(key: string, body: Buffer, contentType: string) {
   await storage.put(key, body, contentType);
   return key;

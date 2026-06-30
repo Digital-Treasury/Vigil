@@ -27,8 +27,8 @@ export function RunNowButton({
       onClick={(e) => {
         e.stopPropagation();
         start(async () => {
-          await runNow(clientId);
-          router.refresh();
+          const runId = await runNow(clientId);
+          router.push(`/runs/${runId}`);
         });
       }}
       className={`flex items-center gap-1.5 rounded-lg font-semibold transition active:scale-[.97] disabled:opacity-60 ${cls}`}

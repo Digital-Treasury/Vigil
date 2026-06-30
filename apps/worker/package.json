@@ -26,6 +26,7 @@
     "sharp": "^0.33.5"
   },
   "devDependencies": {
+    "@types/diff": "^7.0.0",
     "@types/node": "^22.10.7",
     "@types/pngjs": "^6.0.5",
     "tsx": "^4.19.2",
