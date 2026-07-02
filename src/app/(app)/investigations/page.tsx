@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Filter } from 'lucide-react';
+import { Check, CheckCheck, Filter } from 'lucide-react';
 import { useApi, post } from '@/lib/useApi';
 import { Avatar, SeverityBadge, Spinner, Thumb } from '@/components/ui';
 import { formatPct, formatWhen } from '@/lib/format';
@@ -27,6 +27,19 @@ export default function InvestigationsPage() {
   const { data, loading, refresh } = useApi<{ investigations: Investigation[] }>('/api/investigations', 15000);
   const [clientFilter, setClientFilter] = useState<string>('all');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const runBulk = async (action: 'resolve' | 'accept') => {
+    setBulkBusy(true);
+    try {
+      await post('/api/investigations/bulk', { action, ids: [...selected] });
+      setSelected(new Set());
+      await refresh();
+    } finally {
+      setBulkBusy(false);
+    }
+  };
 
   if (loading && !data) {
     return <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 120 }}><Spinner /></div>;
@@ -81,13 +94,34 @@ export default function InvestigationsPage() {
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, color: 'var(--ink-4)', cursor: 'pointer', padding: '0 2px' }}>
+            <input
+              type="checkbox"
+              style={{ width: 15, height: 15, accentColor: 'var(--ink-1)', cursor: 'pointer' }}
+              checked={items.length > 0 && items.every((iv) => selected.has(iv.id))}
+              onChange={(e) => setSelected(e.target.checked ? new Set(items.map((iv) => iv.id)) : new Set())}
+            />
+            Select all shown
+          </label>
           {items.map((iv) => (
             <div
               key={iv.id}
               className="card vg-card-hover"
-              style={{ display: 'flex', gap: 16, padding: 16, cursor: 'pointer' }}
+              style={{ display: 'flex', gap: 14, padding: 16, cursor: 'pointer', background: selected.has(iv.id) ? 'var(--ink-9)' : undefined }}
               onClick={() => router.push(`/review/${iv.result_id}`)}
             >
+              <input
+                type="checkbox"
+                style={{ width: 15, height: 15, accentColor: 'var(--ink-1)', cursor: 'pointer', alignSelf: 'center', flex: 'none' }}
+                checked={selected.has(iv.id)}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  const next = new Set(selected);
+                  if (e.target.checked) next.add(iv.id);
+                  else next.delete(iv.id);
+                  setSelected(next);
+                }}
+              />
               <Thumb src={iv.diff_img} width={108} height={72} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 5 }}>
@@ -124,6 +158,49 @@ export default function InvestigationsPage() {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {selected.size > 0 && (
+        <div
+          style={{
+            position: 'sticky', bottom: 16, zIndex: 5, marginTop: 16,
+            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px',
+            background: 'var(--ink-1)', borderRadius: 13, boxShadow: 'var(--shadow-3)', color: '#fff',
+          }}
+        >
+          <span style={{ fontSize: 13.5, fontWeight: 600 }}>
+            {selected.size} item{selected.size === 1 ? '' : 's'} selected
+          </span>
+          <button
+            className="vg-btn vg-link"
+            style={{ border: 'none', background: 'none', color: 'rgba(255,255,255,.65)', fontSize: 12.5, padding: 0 }}
+            onClick={() => setSelected(new Set())}
+          >
+            Clear
+          </button>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
+            <button
+              className="vg-btn"
+              disabled={bulkBusy}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, height: 38, padding: '0 15px', borderRadius: 9, border: '1px solid rgba(255,255,255,.3)', background: 'transparent', color: '#fff', fontSize: 13, fontWeight: 600 }}
+              onClick={() => runBulk('resolve')}
+            >
+              <CheckCheck size={15} /> Resolve {selected.size}
+            </button>
+            <button
+              className="vg-btn"
+              disabled={bulkBusy}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, height: 38, padding: '0 15px', borderRadius: 9, border: 'none', background: '#fff', color: 'var(--ink-1)', fontSize: 13, fontWeight: 600 }}
+              onClick={() => {
+                if (confirm(`Accept ${selected.size} capture${selected.size === 1 ? '' : 's'} as new baselines and resolve? This overwrites the current baselines for those pages.`)) {
+                  runBulk('accept');
+                }
+              }}
+            >
+              <Check size={15} /> {bulkBusy ? 'Working…' : `Accept ${selected.size} as baselines`}
+            </button>
+          </div>
         </div>
       )}
     </div>

@@ -1,11 +1,11 @@
 'use client';
 
-import { use, useEffect } from 'react';
+import { use, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronLeft, Keyboard, Unplug, Wrench, Clock, Hand } from 'lucide-react';
-import { useApi } from '@/lib/useApi';
-import { Spinner, StatusPill, Thumb } from '@/components/ui';
+import { Check, ChevronLeft, Flag, Keyboard, Unplug, Wrench, Clock, Hand } from 'lucide-react';
+import { useApi, post } from '@/lib/useApi';
+import { Modal, Spinner, StatusPill, Thumb } from '@/components/ui';
 import { diffColor, formatPct, formatWhen } from '@/lib/format';
 
 interface RunReport {
@@ -37,7 +37,11 @@ interface RunReport {
 export default function RunReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const { data, loading } = useApi<RunReport>(`/api/runs/${id}`, 3000);
+  const { data, loading, refresh } = useApi<RunReport>(`/api/runs/${id}`, 3000);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [bulkFlag, setBulkFlag] = useState(false);
+  const [bulkNote, setBulkNote] = useState('');
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -56,6 +60,21 @@ export default function RunReportPage({ params }: { params: Promise<{ id: string
   }
   if (!data) return <div style={{ padding: 40 }}>Run not found.</div>;
   const { run, client, tally, results } = data;
+  const selectable = results.filter((r) => r.status !== 'error' && r.status !== 'running');
+
+  const runBulk = async (action: 'accept' | 'flag', note?: string) => {
+    setBulkBusy(true);
+    try {
+      await post('/api/results/bulk', { action, ids: [...selected], note });
+      setSelected(new Set());
+      setBulkFlag(false);
+      setBulkNote('');
+      await refresh();
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
   const isMaintenance = run.trigger === 'maintenance';
   const TriggerIcon = isMaintenance ? Wrench : run.trigger === 'scheduled' ? Clock : Hand;
 
@@ -116,11 +135,19 @@ export default function RunReportPage({ params }: { params: Promise<{ id: string
       )}
 
       <div className="card" style={{ overflow: 'hidden', marginTop: 14 }}>
-        <div className="table-head" style={{ gridTemplateColumns: '1.7fr 168px 1.5fr 1.2fr 1fr auto', gap: 14 }}>
+        <div className="table-head" style={{ gridTemplateColumns: '24px 1.7fr 168px 1.5fr 1.2fr 1fr auto', gap: 14, alignItems: 'center' }}>
+          <input
+            type="checkbox"
+            style={{ width: 15, height: 15, accentColor: 'var(--ink-1)', cursor: 'pointer' }}
+            checked={selectable.length > 0 && selectable.every((r) => selected.has(r.id))}
+            onChange={(e) => setSelected(e.target.checked ? new Set(selectable.map((r) => r.id)) : new Set())}
+            title="Select all"
+          />
           <span>Page</span><span>Before / After / Diff</span><span>Comparison</span><span>Status</span><span>Lighthouse</span><span />
         </div>
         {results.map((result) => {
           const isError = result.status === 'error';
+          const canSelect = !isError && result.status !== 'running';
           const lh = result.lighthouse;
           const lhBase = result.baselineLighthouse;
           const perfDelta = lh?.performance != null && lhBase?.performance != null ? lh.performance - lhBase.performance : null;
@@ -128,9 +155,21 @@ export default function RunReportPage({ params }: { params: Promise<{ id: string
             <div
               key={result.id}
               className="table-row vg-row-hover"
-              style={{ gridTemplateColumns: '1.7fr 168px 1.5fr 1.2fr 1fr auto', gap: 14, cursor: isError ? 'default' : 'pointer' }}
+              style={{ gridTemplateColumns: '24px 1.7fr 168px 1.5fr 1.2fr 1fr auto', gap: 14, cursor: isError ? 'default' : 'pointer', background: selected.has(result.id) ? 'var(--ink-9)' : undefined }}
               onClick={() => !isError && router.push(`/review/${result.id}`)}
             >
+              <input
+                type="checkbox"
+                style={{ width: 15, height: 15, accentColor: 'var(--ink-1)', cursor: 'pointer', visibility: canSelect ? 'visible' : 'hidden' }}
+                checked={selected.has(result.id)}
+                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  const next = new Set(selected);
+                  if (e.target.checked) next.add(result.id);
+                  else next.delete(result.id);
+                  setSelected(next);
+                }}
+              />
               <div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{result.label}</div>
                 <div style={{ fontSize: 12, color: 'var(--ink-5)' }}>{result.viewport[0].toUpperCase() + result.viewport.slice(1)}</div>
@@ -175,6 +214,78 @@ export default function RunReportPage({ params }: { params: Promise<{ id: string
           );
         })}
       </div>
+
+      {selected.size > 0 && (
+        <div
+          style={{
+            position: 'sticky', bottom: 16, zIndex: 5, marginTop: 16,
+            display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px',
+            background: 'var(--ink-1)', borderRadius: 13, boxShadow: 'var(--shadow-3)', color: '#fff',
+          }}
+        >
+          <span style={{ fontSize: 13.5, fontWeight: 600 }}>
+            {selected.size} page{selected.size === 1 ? '' : 's'} selected
+          </span>
+          <button
+            className="vg-btn vg-link"
+            style={{ border: 'none', background: 'none', color: 'rgba(255,255,255,.65)', fontSize: 12.5, padding: 0 }}
+            onClick={() => setSelected(new Set())}
+          >
+            Clear
+          </button>
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 10 }}>
+            <button
+              className="vg-btn"
+              disabled={bulkBusy}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, height: 38, padding: '0 15px', borderRadius: 9, border: '1px solid rgba(255,255,255,.3)', background: 'transparent', color: '#fff', fontSize: 13, fontWeight: 600 }}
+              onClick={() => setBulkFlag(true)}
+            >
+              <Flag size={14} /> Keep old &amp; flag {selected.size}
+            </button>
+            <button
+              className="vg-btn"
+              disabled={bulkBusy}
+              style={{ display: 'flex', alignItems: 'center', gap: 7, height: 38, padding: '0 15px', borderRadius: 9, border: 'none', background: '#fff', color: 'var(--ink-1)', fontSize: 13, fontWeight: 600 }}
+              onClick={() => {
+                if (confirm(`Accept ${selected.size} capture${selected.size === 1 ? '' : 's'} as new baselines? This overwrites the current baselines for those pages.`)) {
+                  runBulk('accept');
+                }
+              }}
+            >
+              <Check size={15} /> {bulkBusy ? 'Working…' : `Accept ${selected.size} as baselines`}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {bulkFlag && (
+        <Modal
+          title={`Flag ${selected.size} page${selected.size === 1 ? '' : 's'} for investigation`}
+          width={440}
+          onClose={() => setBulkFlag(false)}
+          footer={
+            <>
+              <button className="vg-btn btn-secondary" onClick={() => setBulkFlag(false)}>Cancel</button>
+              <button className="vg-btn btn-primary" disabled={bulkBusy} onClick={() => runBulk('flag', bulkNote)}>
+                Keep old &amp; flag {selected.size}
+              </button>
+            </>
+          }
+        >
+          <p style={{ fontSize: 13, color: 'var(--ink-4)', margin: '0 0 14px', lineHeight: 1.5 }}>
+            The old baselines are kept. Each selected page gets its own entry in the Investigations queue with this note.
+          </p>
+          <label className="field-label">Note (applied to all)</label>
+          <textarea
+            className="input"
+            style={{ height: 84, paddingTop: 10, resize: 'vertical' }}
+            value={bulkNote}
+            onChange={(e) => setBulkNote(e.target.value)}
+            placeholder="What looks wrong across these pages…"
+            autoFocus
+          />
+        </Modal>
+      )}
     </div>
   );
 }
