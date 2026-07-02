@@ -232,17 +232,25 @@ if (PUSH_URL && typeof PUSH_URL === 'string') {
       pages: pages.map((p) => ({ label: p.label, url: p.url, viewports: ['desktop', 'mobile'] })),
     })),
   };
-  const res = await fetch(`${PUSH_URL.replace(/\/+$/, '')}/api/clients/import`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  const summary = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    console.error(`✗ Import failed (HTTP ${res.status}): ${summary.error ?? 'is Vigil running with DEV_AUTH_BYPASS=1?'}`);
+  try {
+    const res = await fetch(`${PUSH_URL.replace(/\/+$/, '')}/api/clients/import`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const summary = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      console.error(`✗ Import failed (HTTP ${res.status}): ${summary.error ?? 'is Vigil running with DEV_AUTH_BYPASS=1?'}`);
+      console.error(`  Your data is safe in seed/vigil-seed.csv — upload it via Dashboard → Import clients.`);
+      process.exit(1);
+    }
+    console.log(`✔ Imported into ${PUSH_URL}:`, summary);
+  } catch {
+    console.error(`✗ Couldn't reach Vigil at ${PUSH_URL} — is it running?`);
+    console.error(`  No problem: seed/vigil-seed.csv is already written. Either start Vigil and`);
+    console.error(`  re-run this command, or upload the CSV via Dashboard → Import clients.`);
     process.exit(1);
   }
-  console.log(`✔ Imported into ${PUSH_URL}:`, summary);
 }
 
 if (missing.length) {
