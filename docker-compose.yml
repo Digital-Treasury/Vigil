@@ -1,0 +1,14 @@
+services:
+  vigil:
+    build: .
+    restart: unless-stopped
+    ports:
+      - '3000:3000'
+    env_file: .env
+    volumes:
+      - vigil-data:/data
+    # Full-page screenshots of long pages need shared memory.
+    shm_size: 1gb
+
+volumes:
+  vigil-data:
