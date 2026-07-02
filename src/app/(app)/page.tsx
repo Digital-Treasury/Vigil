@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Building2, PlayCircle, Eye, Flag, Plus, Play, Search, ChevronRight } from 'lucide-react';
+import { Building2, PlayCircle, Eye, Flag, Plus, Play, Search, ChevronRight, Upload } from 'lucide-react';
 import { useApi, post } from '@/lib/useApi';
 import { StatusPill, Avatar, Modal, Spinner } from '@/components/ui';
+import ImportClientsModal from '@/components/ImportClientsModal';
 import { formatWhen } from '@/lib/format';
 
 interface DashboardClient {
@@ -58,6 +59,7 @@ export default function DashboardPage() {
   const router = useRouter();
   const { data, loading, refresh } = useApi<Dashboard>('/api/dashboard', 8000);
   const [showAdd, setShowAdd] = useState(false);
+  const [showImport, setShowImport] = useState(false);
   const [query, setQuery] = useState('');
 
   const hour = new Date().getHours();
@@ -99,9 +101,14 @@ export default function DashboardPage() {
               : 'All quiet across the fleet.'}
           </p>
         </div>
-        <button className="vg-btn btn-primary" style={{ height: 42, padding: '0 18px' }} onClick={() => setShowAdd(true)}>
-          <Plus size={17} /> Add client
-        </button>
+        <div style={{ display: 'flex', gap: 9 }}>
+          <button className="vg-btn btn-secondary" style={{ height: 42 }} onClick={() => setShowImport(true)}>
+            <Upload size={16} /> Import clients
+          </button>
+          <button className="vg-btn btn-primary" style={{ height: 42, padding: '0 18px' }} onClick={() => setShowAdd(true)}>
+            <Plus size={17} /> Add client
+          </button>
+        </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 14, marginBottom: 28 }}>
@@ -142,9 +149,14 @@ export default function DashboardPage() {
             <br />
             and flags anything that changes — before the client sees it.
           </p>
-          <button className="vg-btn btn-primary" onClick={() => setShowAdd(true)}>
-            <Plus size={16} /> Add client
-          </button>
+          <div style={{ display: 'flex', gap: 9, justifyContent: 'center' }}>
+            <button className="vg-btn btn-secondary" onClick={() => setShowImport(true)}>
+              <Upload size={15} /> Import clients
+            </button>
+            <button className="vg-btn btn-primary" onClick={() => setShowAdd(true)}>
+              <Plus size={16} /> Add client
+            </button>
+          </div>
         </div>
       ) : (
         <div className="card" style={{ overflow: 'hidden' }}>
@@ -205,6 +217,15 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {showImport && (
+        <ImportClientsModal
+          onClose={() => setShowImport(false)}
+          onImported={() => {
+            setShowImport(false);
+            refresh();
+          }}
+        />
+      )}
       {showAdd && (
         <AddClientModal
           onClose={() => setShowAdd(false)}
