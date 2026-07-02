@@ -5,8 +5,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   ChevronLeft, ChevronRight, ExternalLink, Flag, Play, Plus, Upload, Clock, Hand, Wrench,
-  CalendarCheck, FileUp, Check, AlertCircle, Info, Trash2,
+  CalendarCheck, FileUp, Check, AlertCircle, Info, Trash2, Download,
 } from 'lucide-react';
+import { downloadCsv } from '@/lib/download';
+import { PAGE_TEMPLATE } from '@/lib/importParse';
 import { useApi, post, patch, del } from '@/lib/useApi';
 import { Avatar, Modal, Spinner, StatusPill, Toggle, Thumb } from '@/components/ui';
 import { diffColor, formatPct, formatWhen } from '@/lib/format';
@@ -703,6 +705,17 @@ function CsvModal({ clientId, onClose, onImported }: { clientId: number; onClose
         </>
       }
     >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+        <span style={{ fontSize: 12.5, color: 'var(--ink-5)' }}>
+          Paths resolve against this client&apos;s primary URL.
+        </span>
+        <button
+          className="vg-btn btn-secondary btn-sm"
+          onClick={() => downloadCsv('vigil-pages-template.csv', PAGE_TEMPLATE)}
+        >
+          <Download size={14} /> Download template
+        </button>
+      </div>
       <label
         style={{ display: 'block', border: '1.5px dashed var(--ink-6)', borderRadius: 12, padding: 24, textAlign: 'center', background: 'var(--ink-9)', marginBottom: 8, cursor: 'pointer' }}
       >
