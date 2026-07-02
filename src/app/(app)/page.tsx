@@ -60,6 +60,7 @@ export default function DashboardPage() {
   const { data, loading, refresh } = useApi<Dashboard>('/api/dashboard', 8000);
   const [showAdd, setShowAdd] = useState(false);
   const [showImport, setShowImport] = useState(false);
+  const [runningAll, setRunningAll] = useState(false);
   const [query, setQuery] = useState('');
 
   const hour = new Date().getHours();
@@ -102,6 +103,27 @@ export default function DashboardPage() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: 9 }}>
+          <button
+            className="vg-btn btn-secondary"
+            style={{ height: 42 }}
+            disabled={runningAll || data.clients.every((c) => c.pageCount === 0)}
+            onClick={async () => {
+              const eligible = data.clients.filter((c) => c.pageCount > 0 && clientStatus(c) !== 'running').length;
+              if (!confirm(`Run audits for ${eligible} client${eligible === 1 ? '' : 's'} now? The queue captures one page at a time, so a full fleet run takes a while.`)) return;
+              setRunningAll(true);
+              try {
+                const result = await post('/api/run-all');
+                refresh();
+                if (result.skippedRunning) {
+                  alert(`Started ${result.started} runs (${result.skippedRunning} client${result.skippedRunning === 1 ? ' was' : 's were'} already running).`);
+                }
+              } finally {
+                setRunningAll(false);
+              }
+            }}
+          >
+            <PlayCircle size={16} /> {runningAll ? 'Starting…' : 'Run all'}
+          </button>
           <button className="vg-btn btn-secondary" style={{ height: 42 }} onClick={() => setShowImport(true)}>
             <Upload size={16} /> Import clients
           </button>
