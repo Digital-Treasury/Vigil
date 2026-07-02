@@ -99,6 +99,21 @@ Keyboard: `J` next unreviewed page · `A` accept · `K` keep & flag.
 
 ---
 
+## Seeding the client fleet
+
+The repo ships with Digital Treasury's client list ready to import:
+
+- **`seed/clients.csv`** — every client with a homepage row (desktop + mobile). Import it straight away via **Dashboard → Import clients**.
+- **`scripts/seed.mjs`** — the better option: discovers each site's 5–10 key pages automatically (sitemap first, homepage nav as fallback), verifies each page returns 200, and writes `seed/vigil-seed.csv` — or pushes directly into a running instance:
+
+```bash
+node scripts/seed.mjs                              # writes seed/vigil-seed.csv to review/import
+node scripts/seed.mjs --push http://localhost:3000 # discover + import in one step (needs DEV_AUTH_BYPASS=1)
+node scripts/seed.mjs --max 10                     # allow up to 10 pages per client
+```
+
+The client list (names + URLs) lives at the top of `scripts/seed.mjs` — a few clients are missing URLs or have inferred ones flagged `verify: true`; fill/check those and re-run. Re-running is always safe: existing clients are matched by name and already-tracked pages are skipped.
+
 ## Local development
 
 ```bash
